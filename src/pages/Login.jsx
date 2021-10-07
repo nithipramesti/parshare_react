@@ -1,22 +1,31 @@
 import "../assets/styles/login.css";
 
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
 
 import { LoginAction } from "../redux/actions/user";
 
 function Login() {
+  //Global state
+  const authReducer = useSelector((state) => state.authReducer);
+
   //Dispatch
   const dispatch = useDispatch();
 
   //Local state
   let [loginData, setLoginData] = useState({});
   let [errMessage, setErrMessage] = useState("");
-  let [redirect, setRedirect] = useState(false);
+  let [formValid, setFormValid] = useState({ email: true, password: true });
 
-  //Get data from html form, and save it to state 'loginData'
+  //Function for onChange in input form
   const inputHandler = (event) => {
+    //Clear form validation alert
+    if (!(loginData.email && loginData.password)) {
+      setFormValid({ email: true, password: true }); //resetting only when the form invalid before
+    }
+
+    //Save input form data to state
     const value = event.target.value;
     const name = event.target.name;
     setLoginData({ ...loginData, [name]: value });
@@ -24,15 +33,37 @@ function Login() {
 
   //Login button
   const onBtnLogin = () => {
-    //Login user & save token to local storage
-    LoginAction(dispatch, loginData, setErrMessage);
+    if (loginData.email && loginData.password) {
+      //Login user & save token to local storage (or get error message from BE)
+      LoginAction(dispatch, loginData, setErrMessage);
 
-    //Set redirect to 'true' (will redirect to home page)
-    setRedirect(true);
+      //Reset form input (controlled form)
+      setLoginData({ email: "", password: "" });
+    } else {
+      //If there an empty form:
+
+      //make new variables to not trigger state
+      let email = true;
+      let password = true;
+
+      //if email form empty
+      if (!loginData.email) {
+        email = false;
+      }
+
+      //if password form empty
+      if (!loginData.password) {
+        password = false;
+      }
+
+      //set state to trigger rerender and show alert
+      setFormValid({ email, password });
+    }
   };
 
-  if (redirect) {
-    return <Redirect to="/" />; //redirect to homepage
+  if (authReducer.role === "user") {
+    //if role is 'user', redirect to home page
+    return <Redirect to="/" />;
   } else {
     return (
       <div className="login container-fluid">
@@ -54,15 +85,18 @@ function Login() {
                   <input
                     id="form-email"
                     type="text"
-                    className="form-control"
+                    className={`form-control ${
+                      !formValid.email ? `is-invalid` : null
+                    }`}
                     placeholder="Email"
                     name="email"
+                    value={loginData.email}
                     onChange={inputHandler}
                     required
                   />
-                  <div class="invalid-feedback">
-                    Please insert your username or password
-                  </div>
+                  {!formValid.email ? (
+                    <div className="text-danger">Please enter your email</div>
+                  ) : null}
                 </div>
                 <div className="mb-2">
                   <label htmlFor="form-password" className="form-label">
@@ -71,11 +105,20 @@ function Login() {
                   <input
                     id="form-password"
                     type="password"
-                    className="form-control"
+                    className={`form-control ${
+                      !formValid.password ? `is-invalid` : null
+                    }`}
                     placeholder="Password"
                     name="password"
+                    value={loginData.password}
                     onChange={inputHandler}
+                    required
                   />
+                  {!formValid.password ? (
+                    <div className="text-danger">
+                      Please enter your password
+                    </div>
+                  ) : null}
                 </div>
                 <div className="mb-3 text-end">
                   <a href="#" className="link-primary text-end">

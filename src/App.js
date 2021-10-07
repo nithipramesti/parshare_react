@@ -11,6 +11,7 @@ import { KeepLoginAction, CheckStorageAction } from "./redux/actions/user";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Test from "./pages/Test";
+import Navigation from "./components/Navigation";
 
 function App() {
   //Get global state data
@@ -25,7 +26,7 @@ function App() {
   //Check token
   useEffect(() => {
     if (userLocalStorage) {
-      //If token exist, keep user logged in
+      //If token exist, keep user logged in (decode token and save loginData to global state)
       KeepLoginAction(dispatch, userLocalStorage);
     } else {
       //If token not exist, set checkStorage in global state to 'true'
@@ -37,10 +38,11 @@ function App() {
     //App will be rendered only after finish checking local storage (checkStorage: 'true' in global state)
     return (
       <BrowserRouter>
+        <Navigation />
         <Switch>
           <Route component={Login} path="/login" />
           <Route component={Test} path="/test" />
-          <Route component={Home} path="/" />
+          <Route component={Home} path="/" exact />
         </Switch>
       </BrowserRouter>
     );
