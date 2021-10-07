@@ -37,7 +37,7 @@ export const LoginAction = (dispatch, loginData, setErrMessage) => {
 
 //KEEP LOGIN
 export const KeepLoginAction = (dispatch, userLocalStorage) => {
-  Axios.patch(
+  Axios.post(
     "http://localhost:2200/users/keep-login",
     {},
     {
