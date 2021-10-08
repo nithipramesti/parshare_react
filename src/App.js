@@ -13,6 +13,7 @@ import Login from "./pages/Login";
 import Register from './pages/Register';
 import Test from "./pages/Test";
 import Navigation from "./components/Navigation";
+import VerificationPage from './pages/VerificationPage';
 
 function App() {
   //Get global state data
@@ -44,7 +45,8 @@ function App() {
           <Route component={Login} path="/login" />
           <Route component={Test} path="/test" />
           <Route component={Home} path="/" exact />
-<Route component={Register} path="/register"/>
+          <Route component={Register} path="/register" />
+          <Route component={VerificationPage} path="/authentication/:token" />
         </Switch>
       </BrowserRouter>
     );
