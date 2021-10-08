@@ -2,7 +2,7 @@ import "../assets/styles/login.css";
 import React,{useState} from "react";
 import Axios from "axios";
 import {API_URL} from '../data/API';
-import {useHistory} from 'react-router-dom'
+import {useHistory} from 'react-router-dom';
 
 const Register = () => {
     let history = useHistory()

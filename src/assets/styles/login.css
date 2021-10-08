@@ -1,0 +1,54 @@
+.login {
+  height: 100vh;
+}
+
+.row {
+  height: 100%;
+}
+
+.col-left {
+  background-image: url("https://images.pexels.com/photos/5727926/pexels-photo-5727926.jpeg");
+  background-size: cover;
+  background-position: left;
+}
+
+.col-right {
+  background-color: #fff;
+}
+
+.container-login {
+  width: 450px;
+}
+
+form,
+.alert {
+  width: 100%;
+}
+
+.form-usernameEmail:invalid {
+  outline: red;
+}
+
+/* BOOTSTRAP COMPONENTS */
+a.link-primary {
+  color: #314c72;
+}
+
+a.link-primary:hover,
+a.link-primary:active,
+a.link-primary:visited,
+a.link-primary:focus {
+  color: #314c72;
+}
+
+input.btn-primary {
+  border: none;
+  background-color: #041e43;
+}
+
+input.btn-primary:hover,
+input.btn-primary:active,
+input.btn-primary:visited,
+input.btn-primary:focus {
+  background-color: #314c72;
+}
