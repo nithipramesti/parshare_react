@@ -324,7 +324,7 @@ function Products(){
   }
 
   return(
-    <div className="container">
+    <div className="container container-top">
       <div className="row">
         <div className="col-md-6">
           <h1>Products</h1>

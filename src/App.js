@@ -28,7 +28,7 @@ function App() {
   //Dispatch
   const dispatch = useDispatch();
 
-  //Check token
+  //Check token 
   useEffect(() => {
     if (userLocalStorage) {
       //If token exist, keep user logged in (decode token and save loginData to global state)
@@ -50,8 +50,8 @@ function App() {
           <Route component={Home} path="/" exact />
           <Route component={Register} path="/register" />
           <Route component={VerificationPage} path="/authentication/:token" />
-          <Route exact component={Products} path="/admin/products"/>
-          <Route exact component={Parcels} path="/admin/parcels"/>
+          <Route component={Products} path="/admin/products"/>
+          <Route component={Parcels} path="/admin/parcels"/>
         </Switch>
       </BrowserRouter>
     );

@@ -112,7 +112,7 @@ function Parcels(){
   }
 
   return(
-    <div className="container">
+    <div className="container container-top">
       <h1>Parcels</h1>
       {renderGrid()}
     </div>
