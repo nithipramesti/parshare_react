@@ -8,8 +8,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { KeepLoginAction, CheckStorageAction } from "./redux/actions/user";
 
 //Import pages
-import Login from "./pages/Login";
 import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from './pages/Register';
 import Test from "./pages/Test";
 import Navigation from "./components/Navigation";
 
@@ -43,6 +44,7 @@ function App() {
           <Route component={Login} path="/login" />
           <Route component={Test} path="/test" />
           <Route component={Home} path="/" exact />
+<Route component={Register} path="/register"/>
         </Switch>
       </BrowserRouter>
     );
