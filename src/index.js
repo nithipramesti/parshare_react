@@ -8,10 +8,11 @@ import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware } from "redux";
 import ReduxThunk from "redux-thunk";
-import rootReducer from "./redux/reducers";
+import rootReducers from "./redux/reducers";
 
 //Create store for global state
-const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
+
+const store = createStore(rootReducers,applyMiddleware(ReduxThunk))
 
 ReactDOM.render(
   <Provider store={store}>
