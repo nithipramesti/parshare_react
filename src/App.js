@@ -11,6 +11,7 @@ import { KeepLoginAction, CheckStorageAction } from "./redux/actions/user";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Test from "./pages/Test";
+import ForgotPassword from "./pages/ForgotPassword";
 import Navigation from "./components/Navigation";
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
         <Navigation />
         <Switch>
           <Route component={Login} path="/login" />
+          <Route component={ForgotPassword} path="/forgot-password" />
           <Route component={Test} path="/test" />
           <Route component={Home} path="/" exact />
         </Switch>
