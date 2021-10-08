@@ -8,11 +8,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { KeepLoginAction, CheckStorageAction } from "./redux/actions/user";
 
 //Import pages
-import Login from "./pages/Login";
 import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from './pages/Register';
 import Test from "./pages/Test";
 import ForgotPassword from "./pages/ForgotPassword";
 import Navigation from "./components/Navigation";
+import VerificationPage from './pages/VerificationPage';
 
 function App() {
   //Get global state data
@@ -45,6 +47,8 @@ function App() {
           <Route component={ForgotPassword} path="/forgot-password" />
           <Route component={Test} path="/test" />
           <Route component={Home} path="/" exact />
+          <Route component={Register} path="/register" />
+          <Route component={VerificationPage} path="/authentication/:token" />
         </Switch>
       </BrowserRouter>
     );
