@@ -2,7 +2,7 @@ import "../assets/styles/login.css";
 
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Redirect } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 
 import { LoginAction } from "../redux/actions/user";
 
@@ -121,9 +121,9 @@ function Login() {
                   ) : null}
                 </div>
                 <div className="mb-3 text-end">
-                  <a href="#" className="link-primary text-end">
+                  <Link className="link-primary text-end" to="/forgot-password">
                     Forgot Password
-                  </a>
+                  </Link>
                 </div>
                 <div className="mb-4 container-fluid p-0"></div>
                 <input
