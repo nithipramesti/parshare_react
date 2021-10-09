@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { Redirect } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
 import Axios from 'axios';
 import { API_URL } from '../../data/API';
 import { DataGrid } from '@mui/x-data-grid';
 
 function Parcels(){
+  const authReducer = useSelector((state) => state.authReducer);
+
   const [ parcelList, setParcelList ] = useState([])
   const fetchParcel = () => {
     Axios.get(`${API_URL}/parcels/list`)
@@ -44,6 +48,12 @@ function Parcels(){
       {
         field: 'parcel_name',
         headerName: 'Name',
+        headerAlign: 'center',
+        width: 200,
+      },
+      {
+        field: 'parcel_description',
+        headerName: 'Description',
         headerAlign: 'center',
         width: 200,
       }, 
@@ -111,12 +121,16 @@ function Parcels(){
     />
   }
 
-  return(
-    <div className="container container-top">
-      <h1>Parcels</h1>
-      {renderGrid()}
-    </div>
-  )
+  if(authReducer.role !== "admin"){
+    return <Redirect to="/login"/>
+  }else{
+    return(
+      <div className="container container-top">
+        <h1>Parcels</h1>
+        {renderGrid()}
+      </div>
+    )
+  }
 }
 
 export default Parcels;

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Redirect } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
 import Axios from 'axios';
 import { API_URL } from '../../data/API';
 import { Modal, Alert } from 'react-bootstrap';
 import { DataGrid } from '@mui/x-data-grid';
 
 function Products(){
+  const authReducer = useSelector((state) => state.authReducer);
+
   const [ categoryListWithTotal, setCategoryListWithTotal ] = useState([]);
   const [ categoryList, setCategoryList ] = useState([]);
   const [ productList, setProductList ] = useState([])
@@ -17,6 +20,7 @@ function Products(){
   const [ inputCategory, setInputCategory ] = useState({});
   const [ editCategory, setEditCategory ] = useState({});
   const [ showAlert, setShowAlert ] = useState({});
+  const [ getToken, setGetToken ] = useState(localStorage.getItem("token_parshare"));
 
   const fetchCategory = () => {
     Axios.get(`${API_URL}/categories/list`)
@@ -63,7 +67,7 @@ function Products(){
     }
   }
   const addProductHandler = () => {
-    if(inputImage.image && inputCategory.name && inputCategory.price && inputCategory.category && inputCategory.quantity){
+    if(inputImage.image){
       let formData = new FormData();
       let obj = {
         ...inputProduct
@@ -71,7 +75,11 @@ function Products(){
 
       formData.append('data', JSON.stringify(obj));
       formData.append('file', inputImage.image)
-      Axios.post(`${API_URL}/products/add`, formData)
+      Axios.post(`${API_URL}/products/add`, formData, {
+        headers: {
+          'Authorization': `Bearer ${getToken}`
+        }
+      })
       .then(res => {
         fetchProduct();
         setShowAlert({
@@ -80,6 +88,16 @@ function Products(){
           message: "Add product succeed"
         })
       })
+      .catch(err => {
+        err.response.status === 401 ?
+          <Redirect to="/login" />
+        :
+          setShowAlert({
+            show: true,
+            type: "danger",
+            message: err.response.data.data
+          })
+      });
     }else{
       setShowAlert({
         show: true,
@@ -96,7 +114,11 @@ function Products(){
   }
   const addCategoryHandler = () => {
     if(inputCategory.name){
-      Axios.post(`${API_URL}/categories/add`, inputCategory)
+      Axios.post(`${API_URL}/categories/add`, inputCategory, {
+        headers: {
+          'Authorization': `Bearer ${getToken}`
+        }
+      })
       .then(res => {
         fetchCategory();
         setShowAlert({
@@ -106,7 +128,7 @@ function Products(){
         })
       })
       .catch(err => {
-        err.response.data.data === "User not auth!" ?
+        err.response.status === 401 ?
           <Redirect to="/login" />
         :
           setShowAlert({
@@ -131,7 +153,11 @@ function Products(){
   }
   const editCategoryHandler = () => {
     if(editCategory.name && editCategory.id){
-      Axios.patch(`${API_URL}/categories/edit`, editCategory)
+      Axios.patch(`${API_URL}/categories/edit`, editCategory, {
+        headers: {
+          'Authorization': `Bearer ${getToken}`
+        }
+      })
       .then(res => {
         fetchCategory()
         setShowAlert({
@@ -141,7 +167,7 @@ function Products(){
         })
       })
       .catch(err => {
-        err.response.data.data === "User not auth!" ?
+        err.response.status === 401 ?
           <Redirect to="/login" />
         :
           setShowAlert({
@@ -160,17 +186,21 @@ function Products(){
   }
   const deleteCategoryHandler = () => {
     if(editCategory.id){
-      Axios.delete(`${API_URL}/categories/delete?id=${editCategory.id}`)
+      Axios.delete(`${API_URL}/categories/delete?id=${editCategory.id}`, {
+        headers: {
+          'Authorization': `Bearer ${getToken}`
+        }
+      })
       .then(res => {
         fetchCategory()
         setShowAlert({
           show: true,
           type: "success",
-          message: "Delete product succeed"
+          message: "Delete category succeed"
         })
       })
       .catch(err => {
-        err.response.data.data === "User not auth!" ?
+        err.response.status === 401 ?
           <Redirect to="/login" />
         :
           setShowAlert({
@@ -323,238 +353,244 @@ function Products(){
     />
   }
 
-  return(
-    <div className="container container-top">
-      <div className="row">
-        <div className="col-md-6">
-          <h1>Products</h1>
+  if(authReducer.role !== "admin"){
+    return <Redirect to="/login"/>
+  }else{
+    return(
+      <div className="container container-top">
+        <div className="row">
+          <div className="col-md-6">
+            <h1>Products</h1>
+          </div>
+          <div className="col-md-6">
+            <button 
+            className="btn btn-primary btn-right" 
+            onClick={handleShowProductModal}
+            disabled={
+              categoryList.length > 0 ?
+                false
+              : true
+            }
+            >
+              Add Product
+            </button>
+          </div>
         </div>
-        <div className="col-md-6">
-          <button 
-          className="btn btn-primary btn-right" 
-          onClick={handleShowProductModal}
-          disabled={
-            categoryList.length > 0 ?
-              false
-            : true
+
+        <div style={{overFlowY: 'auto', minWidth: '100%'}}>
+          <div className="border border-secondary" style={{display: 'inline-block', padding: "2px 10px 2px 10px", minWidth: "60px", marginRight: "7px", borderRadius: "20px", marginBottom: "2px", textAlign: "center"}}>
+            All <span class="badge alert-primary">
+              {
+                categoryListWithTotal.reduce((a, b) => {
+                  return a + b.total
+                }, 0)
+              }
+            </span>
+          </div>
+          {
+            categoryList.map(category => {
+              if(category.active === "true"){
+                return (
+                  <div className="border border-secondary hover-display-parent" style={{display: 'inline-block', padding: "2px 10px 2px 10px", minWidth: "60px", marginRight: "7px", borderRadius: "20px", marginBottom: "2px", textAlign: "center"}}>
+                    {`${category.category} `}
+                    {
+                      categoryListWithTotal.map(total => 
+                        total.total > 0 && total.id_category === category.id_category ?
+                          <>
+                          <span class="badge alert-primary">{total.total}</span>
+                          <span onClick={() => handleShowEditCategoryModal(total.id_category, total.category, true)} className="hover-display hover-yellow badge badge-pill alert-warning" style={{fontSize: "11px", cursor: "pointer"}}>Edit</span>
+                          </>
+                        : <span onClick={() => handleShowEditCategoryModal(category.id_category, category.category, false)} className="hover-display hover-yellow badge badge-pill alert-warning" style={{fontSize: "11px", cursor: "pointer"}}>Edit</span>
+                      )
+                    }
+                  </div>
+                )
+              }
+            })
           }
-          >
-            Add Product
+          <button onClick={handleShowCategoryModal} className="btn border border-secondary" style={{display: 'inline-block', padding: "2px 10px 2px 10px", minWidth: "60px", marginRight: "7px", borderRadius: "20px", marginBottom: "2px", textAlign: "center"}}>
+            Add Category
           </button>
         </div>
-      </div>
+        
+        {renderGrid()}
 
-      <div style={{overFlowY: 'auto', minWidth: '100%'}}>
-        <div className="border border-secondary" style={{display: 'inline-block', padding: "2px 10px 2px 10px", minWidth: "60px", marginRight: "7px", borderRadius: "20px", marginBottom: "2px", textAlign: "center"}}>
-          All <span class="badge alert-primary">
+        <Modal show={showCategoryModal} onHide={handleCloseCategoryModal}>
+          <Modal.Header>
+            <Modal.Title>Add Category</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
             {
-              categoryListWithTotal.reduce((a, b) => {
-                return a + b.total
-              }, 0)
+              showAlert.show ?
+                <Alert variant={showAlert.type}>
+                  {showAlert.message}
+                </Alert>
+              : null
             }
-          </span>
-        </div>
-        {
-          categoryList.map(category => {
-            return (
-              <div className="border border-secondary hover-display-parent" style={{display: 'inline-block', padding: "2px 10px 2px 10px", minWidth: "60px", marginRight: "7px", borderRadius: "20px", marginBottom: "2px", textAlign: "center"}}>
-                {`${category.category} `}
-                {
-                  categoryListWithTotal.map(total => 
-                    total.total && total.category === category.category ?
-                      <>
-                      <span class="badge alert-primary">{total.total}</span>
-                      <span onClick={() => handleShowEditCategoryModal(category.id_category, category.category, true)} className="hover-display hover-yellow badge badge-pill alert-warning" style={{fontSize: "11px", cursor: "pointer"}}>Edit</span>
-                      </>
-                    : <span onClick={() => handleShowEditCategoryModal(category.id_category, category.category, false)} className="hover-display hover-yellow badge badge-pill alert-warning" style={{fontSize: "11px", cursor: "pointer"}}>Edit</span>
-                  )
-                }
+            <label htmlFor="form-email" className="form-label">
+              Name
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Product Name"
+              name="name"
+              onChange={inputCategoryHandler}
+              value={inputCategory.name}
+              required
+            />
+            <div className="row">
+              <div className="col-md-6">
+                <button type="button" onClick={addCategoryHandler} className="btn btn-success w-100 mt-3">Add</button>
               </div>
-            )
-          })
-        }
-        <button onClick={handleShowCategoryModal} className="btn border border-secondary" style={{display: 'inline-block', padding: "2px 10px 2px 10px", minWidth: "60px", marginRight: "7px", borderRadius: "20px", marginBottom: "2px", textAlign: "center"}}>
-          Add Category
-        </button>
+              <div className="col-md-6">
+                <button onClick={handleCloseCategoryModal} className="btn btn-secondary w-100 mt-3">Close</button>
+              </div>
+            </div>
+          </Modal.Body>
+        </Modal>
+
+        <Modal show={showEditCategoryModal} onHide={handleCloseEditCategoryModal}>
+          <Modal.Header>
+            <Modal.Title>Edit Category</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {
+              showAlert.show ?
+                <Alert variant={showAlert.type}>
+                  {showAlert.message}
+                </Alert>
+              : null
+            }
+            <label htmlFor="form-email" className="form-label">
+              Name
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Product Name"
+              name="name"
+              onChange={inputEditCategoryHandler}
+              value={editCategory.name}
+              required
+            />
+            <div className="row">
+              {
+                editCategory.total ?
+                  <>
+                  <div className="col-md-6">
+                    <button type="button" onClick={editCategoryHandler} className="btn btn-success w-100 mt-3">Edit</button>
+                  </div>
+                  <div className="col-md-6">
+                    <button onClick={handleCloseEditCategoryModal} className="btn btn-secondary w-100 mt-3">Close</button>
+                  </div>
+                  </>
+                :
+                  <>
+                  <div className="col-md-4">
+                    <button type="button" onClick={editCategoryHandler} className="btn btn-success w-100 mt-3">Edit</button>
+                  </div>
+                  <div className="col-md-4">
+                    <button type="button" onClick={deleteCategoryHandler} className="btn btn-danger w-100 mt-3">Delete</button>
+                  </div>
+                  <div className="col-md-4">
+                    <button onClick={handleCloseEditCategoryModal} className="btn btn-secondary w-100 mt-3">Close</button>
+                  </div>
+                  </>
+              }
+            </div>
+          </Modal.Body>
+        </Modal>
+
+        <Modal show={showProductModal} onHide={handleCloseProductModal}>
+          <Modal.Header>
+            <Modal.Title>Add Product</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {
+              showAlert.show ?
+                <Alert variant={showAlert.type}>
+                  {showAlert.message}
+                </Alert>
+              : null
+            }
+            <div className="container" style={
+              inputImage.image ?
+                {display: 'block'}
+              : {display: 'none'}
+            }>
+              <img id="preview" width="150px"></img>
+            </div>
+            <label htmlFor="form-email" className="form-label">
+              Image
+            </label>
+            <input
+              type="file"
+              className="form-control"
+              placeholder="Image"
+              name="image"
+              onChange={inputImageHandler}
+              required
+            />
+            <label htmlFor="form-email" className="form-label">
+              Name
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Product Name"
+              name="name"
+              onChange={inputProductHandler}
+              value={inputProduct.name}
+              required
+            />
+            <label htmlFor="form-email" className="form-label">
+              Category
+            </label>
+            <select class="form-select" aria-label="Default select example" name="category" onChange={inputProductHandler}>
+              {
+                categoryList.map(category => {
+                  return <option value={category.id_category}>{category.category}</option>
+                })
+              }
+            </select>
+            <label htmlFor="form-email" className="form-label">
+              Price
+            </label>
+            <input
+              type="number"
+              className="form-control"
+              placeholder="Product Price"
+              name="price"
+              onChange={inputProductHandler}
+              value={inputProduct.price}
+              required
+            />
+            <label htmlFor="form-email" className="form-label">
+              Quantity
+            </label>
+            <input
+              type="number"
+              className="form-control"
+              placeholder="Product Quantity"
+              name="quantity"
+              onChange={inputProductHandler}
+              value={inputProduct.quantity}
+              required
+            />
+            <div className="row">
+              <div className="col-md-6">
+                <button type="button" onClick={addProductHandler} className="btn btn-success w-100 mt-3">Add</button>
+              </div>
+              <div className="col-md-6">
+                <button onClick={handleCloseProductModal} className="btn btn-secondary w-100 mt-3">Close</button>
+              </div>
+            </div>
+          </Modal.Body>
+        </Modal>
       </div>
-      
-      {renderGrid()}
-
-      <Modal show={showCategoryModal} onHide={handleCloseCategoryModal}>
-        <Modal.Header>
-          <Modal.Title>Add Category</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {
-            showAlert.show ?
-              <Alert variant={showAlert.type}>
-                {showAlert.message}
-              </Alert>
-            : null
-          }
-          <label htmlFor="form-email" className="form-label">
-            Name
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Product Name"
-            name="name"
-            onChange={inputCategoryHandler}
-            value={inputCategory.name}
-            required
-          />
-          <div className="row">
-            <div className="col-md-6">
-              <button type="button" onClick={addCategoryHandler} className="btn btn-success w-100 mt-3">Add</button>
-            </div>
-            <div className="col-md-6">
-              <button onClick={handleCloseCategoryModal} className="btn btn-secondary w-100 mt-3">Close</button>
-            </div>
-          </div>
-        </Modal.Body>
-      </Modal>
-
-      <Modal show={showEditCategoryModal} onHide={handleCloseEditCategoryModal}>
-        <Modal.Header>
-          <Modal.Title>Edit Category</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {
-            showAlert.show ?
-              <Alert variant={showAlert.type}>
-                {showAlert.message}
-              </Alert>
-            : null
-          }
-          <label htmlFor="form-email" className="form-label">
-            Name
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Product Name"
-            name="name"
-            onChange={inputEditCategoryHandler}
-            value={editCategory.name}
-            required
-          />
-          <div className="row">
-            {
-              editCategory.total ?
-                <>
-                <div className="col-md-6">
-                  <button type="button" onClick={editCategoryHandler} className="btn btn-success w-100 mt-3">Edit</button>
-                </div>
-                <div className="col-md-6">
-                  <button onClick={handleCloseEditCategoryModal} className="btn btn-secondary w-100 mt-3">Close</button>
-                </div>
-                </>
-              :
-                <>
-                <div className="col-md-4">
-                  <button type="button" onClick={editCategoryHandler} className="btn btn-success w-100 mt-3">Edit</button>
-                </div>
-                <div className="col-md-4">
-                  <button type="button" onClick={deleteCategoryHandler} className="btn btn-danger w-100 mt-3">Delete</button>
-                </div>
-                <div className="col-md-4">
-                  <button onClick={handleCloseEditCategoryModal} className="btn btn-secondary w-100 mt-3">Close</button>
-                </div>
-                </>
-            }
-          </div>
-        </Modal.Body>
-      </Modal>
-
-      <Modal show={showProductModal} onHide={handleCloseProductModal}>
-        <Modal.Header>
-          <Modal.Title>Add Product</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {
-            showAlert.show ?
-              <Alert variant={showAlert.type}>
-                {showAlert.message}
-              </Alert>
-            : null
-          }
-          <div className="container" style={
-            inputImage.image ?
-              {display: 'block'}
-            : {display: 'none'}
-          }>
-            <img id="preview" width="150px"></img>
-          </div>
-          <label htmlFor="form-email" className="form-label">
-            Image
-          </label>
-          <input
-            type="file"
-            className="form-control"
-            placeholder="Image"
-            name="image"
-            onChange={inputImageHandler}
-            required
-          />
-          <label htmlFor="form-email" className="form-label">
-            Name
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Product Name"
-            name="name"
-            onChange={inputProductHandler}
-            value={inputProduct.name}
-            required
-          />
-          <label htmlFor="form-email" className="form-label">
-            Category
-          </label>
-          <select class="form-select" aria-label="Default select example" name="category" onChange={inputProductHandler}>
-            {
-              categoryList.map(category => {
-                return <option value={category.id_category}>{category.category}</option>
-              })
-            }
-          </select>
-          <label htmlFor="form-email" className="form-label">
-            Price
-          </label>
-          <input
-            type="number"
-            className="form-control"
-            placeholder="Product Price"
-            name="price"
-            onChange={inputProductHandler}
-            value={inputProduct.price}
-            required
-          />
-          <label htmlFor="form-email" className="form-label">
-            Quantity
-          </label>
-          <input
-            type="number"
-            className="form-control"
-            placeholder="Product Quantity"
-            name="quantity"
-            onChange={inputProductHandler}
-            value={inputProduct.quantity}
-            required
-          />
-          <div className="row">
-            <div className="col-md-6">
-              <button type="button" onClick={addProductHandler} className="btn btn-success w-100 mt-3">Add</button>
-            </div>
-            <div className="col-md-6">
-              <button onClick={handleCloseProductModal} className="btn btn-secondary w-100 mt-3">Close</button>
-            </div>
-          </div>
-        </Modal.Body>
-      </Modal>
-    </div>
-  )
+    )
+  }
 }
 
 export default Products;
