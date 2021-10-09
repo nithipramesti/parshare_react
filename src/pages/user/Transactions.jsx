@@ -6,9 +6,8 @@ function Transactions(){
 
   if (authReducer.role === "user") {
     //if role is 'user', redirect to home page
-    return <Redirect to="/" />;
   } else {
-
+    return <Redirect to="/login" />;
   }
 }
 
