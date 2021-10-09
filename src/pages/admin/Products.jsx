@@ -20,7 +20,6 @@ function Products(){
   const [ inputCategory, setInputCategory ] = useState({});
   const [ editCategory, setEditCategory ] = useState({});
   const [ showAlert, setShowAlert ] = useState({});
-  const [ getToken, setGetToken ] = useState(localStorage.getItem("token_parshare"));
   const [ showEditProductModal, setShowEditProductModal ] = useState(false);
   const [ editProduct, setEditProduct ] = useState({});
   const [ editImage, setEditImage ] = useState({});
@@ -80,7 +79,7 @@ function Products(){
       formData.append('file', inputImage.image)
       Axios.post(`${API_URL}/products/add`, formData, {
         headers: {
-          'Authorization': `Bearer ${getToken}`
+          'Authorization': `Bearer ${localStorage.getItem("token_parshare")}`
         }
       })
       .then(res => {
@@ -128,13 +127,12 @@ function Products(){
         ...editProduct
       }
 
-      if(editImage.image){
-        formData.append('data', JSON.stringify(obj));
-      }
-      formData.append('file', editImage.image)
-      Axios.patch(`${API_URL}/products/edit?id=${editProduct.id}`, formData, {
+      formData.append('data', obj);
+      formData.append('file', editImage.image);
+      console.log(formData)
+      Axios.patch(`${API_URL}/products/edit`, formData, {
         headers: {
-          'Authorization': `Bearer ${getToken}`
+          'Authorization': `Bearer ${localStorage.getItem("token_parshare")}`
         }
       })
       .then(res => {
@@ -167,7 +165,7 @@ function Products(){
     if(id){
       Axios.delete(`${API_URL}/products/delete?id=${id}`, {
         headers: {
-          'Authorization': `Bearer ${getToken}`
+          'Authorization': `Bearer ${localStorage.getItem("token_parshare")}`
         }
       })
       .then(res => {
@@ -200,7 +198,7 @@ function Products(){
     if(inputCategory.name){
       Axios.post(`${API_URL}/categories/add`, inputCategory, {
         headers: {
-          'Authorization': `Bearer ${getToken}`
+          'Authorization': `Bearer ${localStorage.getItem("token_parshare")}`
         }
       })
       .then(res => {
@@ -239,7 +237,7 @@ function Products(){
     if(editCategory.name && editCategory.id){
       Axios.patch(`${API_URL}/categories/edit`, editCategory, {
         headers: {
-          'Authorization': `Bearer ${getToken}`
+          'Authorization': `Bearer ${localStorage.getItem("token_parshare")}`
         }
       })
       .then(res => {
@@ -273,7 +271,7 @@ function Products(){
     if(editCategory.id){
       Axios.delete(`${API_URL}/categories/delete?id=${editCategory.id}`, {
         headers: {
-          'Authorization': `Bearer ${getToken}`
+          'Authorization': `Bearer ${localStorage.getItem("token_parshare")}`
         }
       })
       .then(res => {
