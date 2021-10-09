@@ -10,11 +10,13 @@ import { KeepLoginAction, CheckStorageAction } from "./redux/actions/user";
 //Import pages
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Register from './pages/Register';
+import Register from "./pages/Register";
 import Test from "./pages/Test";
 import ForgotPassword from "./pages/ForgotPassword";
 import Navigation from "./components/Navigation";
-import VerificationPage from './pages/VerificationPage';
+import VerificationPage from "./pages/VerificationPage";
+import ResetPassword from "./pages/ResetPassword";
+import ChangePassword from "./pages/ChangePassword";
 
 function App() {
   //Get global state data
@@ -44,11 +46,12 @@ function App() {
         <Navigation />
         <Switch>
           <Route component={Login} path="/login" />
-          <Route component={ForgotPassword} path="/forgot-password" />
-          <Route component={Test} path="/test" />
-          <Route component={Home} path="/" exact />
           <Route component={Register} path="/register" />
           <Route component={VerificationPage} path="/authentication/:token" />
+          <Route component={ForgotPassword} path="/forgot-password" />
+          <Route component={ResetPassword} path="/reset-password/:token" />
+          <Route component={ChangePassword} path="/change-password/" />
+          <Route component={Home} path="/" exact />
         </Switch>
       </BrowserRouter>
     );

@@ -1,60 +1,85 @@
 import "../assets/styles/forgot-password.css";
 
 import Axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { API_URL } from "../data/API";
 
 function ForgotPassword() {
-  //Local state
-  let [emailUser, setemailUser] = useState("");
-  let [sendSuccess, setSendSuccess] = useState("");
-  let [errMessage, setErrMessage] = useState("");
-  let [formValid, setFormValid] = useState(true);
+  //State for input values
+  let [inputValues, setInputValues] = useState({ email: "" });
+
+  //State for handling validation error
+  let [errors, setErrors] = useState({});
+
+  //State to indicate wether form is submitting or not
+  let [isSubmitting, setIsSubmitting] = useState(false);
+  let [isSubmitted, setIsSubmitted] = useState(false);
+
+  //State to handling success/error message from backend
+  let [resMessage, setResMessage] = useState({ success: "", error: "" });
 
   //Function for onChange in input form
-  const inputHandler = (event) => {
-    //Clear form validation alert
-    if (!formValid) setFormValid(true); //resetting only when the form invalid before
+  const inputHandler = (e) => {
+    //Save input value to state
+    const { name, value } = e.target;
+    setInputValues({ ...inputValues, [name]: value });
 
-    //Clear success alert
-    if (sendSuccess) setSendSuccess("");
-
-    //Clear error/failed alert
-    if (errMessage) setErrMessage("");
-
-    //Save input form data to state
-    setemailUser(event.target.value);
+    //Reset alert from backend
+    if (resMessage.error) {
+      setResMessage({ ...resMessage, error: "" });
+    }
   };
 
-  //Login button
-  const onBtnSend = () => {
-    if (emailUser) {
-      //Send emailUser to backend in order to send change password link & token
+  //Function to save validate info
+  const validateInfo = (values) => {
+    let errors = {};
+
+    if (!values.email) {
+      errors.email = "Please insert your email";
+    } else if (!/\S+@\S+\.\S+/.test(values.email)) {
+      errors.email = "Email is invalid";
+    }
+
+    return errors;
+  };
+
+  //Function when submitting form
+  const submitHandler = (e) => {
+    e.preventDefault();
+
+    setErrors(validateInfo(inputValues)); //trigger state to display validation alert
+    setIsSubmitting(true);
+  };
+
+  //Function
+  useEffect(() => {
+    if (Object.keys(errors).length === 0 && isSubmitting) {
+      //Send request to backend
       Axios.post(`${API_URL}/change-password/send-email`, {
-        email: emailUser,
+        email: inputValues.email,
       })
         .then((res) => {
           if (res.data.errMessage) {
-            setErrMessage(res.data.errMessage);
+            setResMessage({ ...resMessage, error: res.data.errMessage });
           } else {
-            //show success alert
-            setSendSuccess(res.data.message);
+            setIsSubmitted(true);
+
+            setResMessage({ success: res.data.message });
 
             //Reset form input (controlled form)
-            setemailUser("");
+            // setInputValues({ email: "" });
           }
         })
         .catch((err) => {
           console.log(err);
-          setErrMessage("Server error, please try again later");
+          setResMessage({
+            ...resMessage,
+            error: "Server error, please try again later",
+          });
         });
-    } else {
-      //If email form empty
-      //set state to trigger rerender and show alert
-      setFormValid(false);
     }
-  };
+  }, [errors]);
 
   return (
     <div className="forgot-password">
@@ -65,42 +90,39 @@ function ForgotPassword() {
           create a new password via email.
         </p>
 
-        <form>
+        <form onSubmit={submitHandler} noValidate>
           <div className="mb-3">
             <label htmlFor="form-email" className="form-label">
               Email
             </label>
             <input
               id="form-email"
-              type="text"
-              className={`form-control ${!formValid ? `is-invalid` : null}`}
+              type="email"
+              className={`form-control ${errors.email ? `is-invalid` : null}`}
               placeholder="Email"
               name="email"
-              value={emailUser}
+              value={inputValues.email}
               onChange={inputHandler}
               required
             />
-            {!formValid ? (
-              <div className="text-danger">Please enter your email</div>
-            ) : null}
+            {errors.email && <div className="text-danger">{errors.email}</div>}
           </div>
 
           <div className="mb-4 container-fluid p-0"></div>
           <input
-            type="button"
+            type="submit"
             value="Send"
             className="btn btn-primary btn-send py-2 container-fluid mb-3"
-            onClick={onBtnSend}
           />
         </form>
-        {sendSuccess ? (
+        {resMessage.success && (
           <div className="alert alert-success mt-3" role="alert">
-            {sendSuccess}
+            {resMessage.success}
           </div>
-        ) : null}
-        {errMessage ? (
+        )}
+        {resMessage.error ? (
           <div className="alert alert-danger mt-3" role="alert">
-            {errMessage}
+            {resMessage.error}
           </div>
         ) : null}
 
