@@ -21,6 +21,9 @@ function Products(){
   const [ editCategory, setEditCategory ] = useState({});
   const [ showAlert, setShowAlert ] = useState({});
   const [ getToken, setGetToken ] = useState(localStorage.getItem("token_parshare"));
+  const [ showEditProductModal, setShowEditProductModal ] = useState(false);
+  const [ editProduct, setEditProduct ] = useState({});
+  const [ editImage, setEditImage ] = useState({});
 
   const fetchCategory = () => {
     Axios.get(`${API_URL}/categories/list`)
@@ -67,7 +70,7 @@ function Products(){
     }
   }
   const addProductHandler = () => {
-    if(inputImage.image){
+    if(inputImage.image && inputProduct.name && inputProduct.price && inputProduct.category && inputProduct.quantity){
       let formData = new FormData();
       let obj = {
         ...inputProduct
@@ -90,7 +93,7 @@ function Products(){
       })
       .catch(err => {
         err.response.status === 401 ?
-          <Redirect to="/login" />
+          window.location.replace("/login")
         :
           setShowAlert({
             show: true,
@@ -103,6 +106,87 @@ function Products(){
         show: true,
         type: "warning",
         message: "Please fill out all the form!"
+      })
+    }
+  }
+  const editImageHandler = (e) => {
+    if(e.target.files[0]){
+      setEditImage({ ...editProduct, imageName: e.target.files[0].name, image: e.target.files[0] });
+      let preview = document.getElementById("edit_preview")
+      preview.src = URL.createObjectURL(e.target.files[0]);
+    }
+  }
+  const editProductHandler = (e) => {
+    const value = e.target.value;
+    const name = e.target.name;
+    setEditProduct({ ...inputProduct, [name]: value });
+  }
+  const submitEditProductHandler = () => {
+    if(editProduct.id && editProduct.name && editProduct.price && editProduct.category && editProduct.quantity){
+      let formData = new FormData();
+      let obj = {
+        ...editProduct
+      }
+
+      if(editImage.image){
+        formData.append('data', JSON.stringify(obj));
+      }
+      formData.append('file', editImage.image)
+      Axios.patch(`${API_URL}/products/edit?id=${editProduct.id}`, formData, {
+        headers: {
+          'Authorization': `Bearer ${getToken}`
+        }
+      })
+      .then(res => {
+        fetchProduct();
+        setShowAlert({
+          show: true,
+          type: "success",
+          message: "Add product succeed"
+        })
+      })
+      .catch(err => {
+        err.response.status === 401 ?
+          window.location.replace("/login")
+        :
+          setShowAlert({
+            show: true,
+            type: "danger",
+            message: err.response.data.data
+          })
+      });
+    }else{
+      setShowAlert({
+        show: true,
+        type: "warning",
+        message: "Please fill out all the form!"
+      })
+    }
+  }
+  const deleteProductHandler = (id) => {
+    if(id){
+      Axios.delete(`${API_URL}/products/delete?id=${id}`, {
+        headers: {
+          'Authorization': `Bearer ${getToken}`
+        }
+      })
+      .then(res => {
+        fetchProduct()
+        setShowAlert({
+          show: true,
+          type: "success",
+          message: "Delete product succeed"
+        })
+      })
+      .catch(err => {
+        err.response.status === 401 ?
+          window.location.replace("/login")
+        :
+          setShowAlert({
+            show: true,
+            type: "danger",
+            message: err.response.data.data
+          })
       })
     }
   }
@@ -129,7 +213,7 @@ function Products(){
       })
       .catch(err => {
         err.response.status === 401 ?
-          <Redirect to="/login" />
+          window.location.replace("/login")
         :
           setShowAlert({
             show: true,
@@ -160,6 +244,7 @@ function Products(){
       })
       .then(res => {
         fetchCategory()
+        fetchProduct()
         setShowAlert({
           show: true,
           type: "success",
@@ -168,7 +253,7 @@ function Products(){
       })
       .catch(err => {
         err.response.status === 401 ?
-          <Redirect to="/login" />
+          window.location.replace("/login")
         :
           setShowAlert({
             show: true,
@@ -201,7 +286,7 @@ function Products(){
       })
       .catch(err => {
         err.response.status === 401 ?
-          <Redirect to="/login" />
+          window.location.replace("/login")
         :
           setShowAlert({
             show: true,
@@ -253,6 +338,32 @@ function Products(){
     })
     setEditCategory({})
     setShowEditCategoryModal(false)
+  }
+
+  const handleShowEditProductModal = (id) => {
+    setShowAlert({
+      show: false
+    })
+    productList.map((product) => {
+      if(product.id_product === id){
+        setEditProduct({
+          id: product.id_product,
+          name: product.product_name,
+          price: product.product_price,
+          image: product.image_product,
+          category: product.id_category,
+          quantity: product.product_quantity,
+        })
+      }
+    })
+    setShowEditProductModal(true)
+  }
+  const handleCloseEditProductModal = () => {
+    setShowAlert({
+      show: false
+    })
+    setEditProduct({})
+    setShowEditProductModal(false)
   }
 
   const renderGrid = () => {
@@ -339,7 +450,7 @@ function Products(){
         sortable: false,
         filterable: false,
         renderCell: (params) => (
-          <button class="btn btn-primary" style={{marginRight: "10px"}}>Edit</button>
+          <button onClick={() => handleShowEditProductModal(params.value)} class="btn btn-primary" style={{marginRight: "10px"}}>Edit</button>
         )
       }
     ];
@@ -400,7 +511,7 @@ function Products(){
                           <span class="badge alert-primary">{total.total}</span>
                           <span onClick={() => handleShowEditCategoryModal(total.id_category, total.category, true)} className="hover-display hover-yellow badge badge-pill alert-warning" style={{fontSize: "11px", cursor: "pointer"}}>Edit</span>
                           </>
-                        : <span onClick={() => handleShowEditCategoryModal(category.id_category, category.category, false)} className="hover-display hover-yellow badge badge-pill alert-warning" style={{fontSize: "11px", cursor: "pointer"}}>Edit</span>
+                        : null
                       )
                     }
                   </div>
@@ -584,6 +695,98 @@ function Products(){
               </div>
               <div className="col-md-6">
                 <button onClick={handleCloseProductModal} className="btn btn-secondary w-100 mt-3">Close</button>
+              </div>
+            </div>
+          </Modal.Body>
+        </Modal>
+
+        <Modal show={showEditProductModal} onHide={handleCloseEditProductModal}>
+          <Modal.Header>
+            <Modal.Title>Edit Product</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {
+              showAlert.show ?
+                <Alert variant={showAlert.type}>
+                  {showAlert.message}
+                </Alert>
+              : null
+            }
+            <div className="container">
+              <img src={`${API_URL}/${editProduct.image}`} width="150px" style={{display: "inline-block"}}></img>
+              <img id="edit_preview" width="150px" style={
+              editImage.image ?
+                {display: 'inline-block'}
+              : {display: 'none'}
+              }></img>
+            </div>
+            <label htmlFor="form-email" className="form-label">
+              Image
+            </label>
+            <input
+              type="file"
+              className="form-control"
+              placeholder="Image"
+              name="image"
+              onChange={editImageHandler}
+            />
+            <label htmlFor="form-email" className="form-label">
+              Name
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Product Name"
+              name="name"
+              onChange={editProductHandler}
+              value={editProduct.name}
+              required
+            />
+            <label htmlFor="form-email" className="form-label">
+              Category
+            </label>
+            <select class="form-select" aria-label="Default select example" name="category" onChange={inputProductHandler}>
+              {
+                categoryList.map(category => 
+                  category.id_category === editProduct.category ? 
+                    <option value={category.id_category} selected>{category.category}</option>
+                  : <option value={category.id_category}>{category.category}</option>
+                )
+              }
+            </select>
+            <label htmlFor="form-email" className="form-label">
+              Price
+            </label>
+            <input
+              type="number"
+              className="form-control"
+              placeholder="Product Price"
+              name="price"
+              onChange={editProductHandler}
+              value={editProduct.price}
+              required
+            />
+            <label htmlFor="form-email" className="form-label">
+              Quantity
+            </label>
+            <input
+              type="number"
+              className="form-control"
+              placeholder="Product Quantity"
+              name="quantity"
+              onChange={editProductHandler}
+              value={editProduct.quantity}
+              required
+            />
+            <div className="row">
+              <div className="col-md-4">
+                <button type="button" onClick={submitEditProductHandler} className="btn btn-success w-100 mt-3">Add</button>
+              </div>
+              <div className="col-md-4">
+                <button type="button" onClick={() => deleteProductHandler(editProduct.id)} className="btn btn-danger w-100 mt-3">Delete</button>
+              </div>
+              <div className="col-md-4">
+                <button onClick={handleCloseEditProductModal} className="btn btn-secondary w-100 mt-3">Close</button>
               </div>
             </div>
           </Modal.Body>
