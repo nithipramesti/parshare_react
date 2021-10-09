@@ -39,14 +39,22 @@ function Navigation() {
           }
           id="basic-nav-dropdown"
         >
+          <NavDropdown.Item href="#action/3.2">
+            <Link to="/" style={{ color: "inherit", textDecoration: "none" }}>
+              Transactions
+            </Link>
+          </NavDropdown.Item>
           <NavDropdown.Item>
             <Link to="/" style={{ color: "inherit", textDecoration: "none" }}>
               Account Setting
             </Link>
           </NavDropdown.Item>
-          <NavDropdown.Item href="#action/3.2">
-            <Link to="/" style={{ color: "inherit", textDecoration: "none" }}>
-              Transactions
+          <NavDropdown.Item>
+            <Link
+              to="/change-password"
+              style={{ color: "inherit", textDecoration: "none" }}
+            >
+              Change Password
             </Link>
           </NavDropdown.Item>
 
