@@ -1,5 +1,6 @@
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.css";
+import "./assets/styles/admin/style.css";
 
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { useEffect } from "react";
@@ -17,6 +18,8 @@ import Navigation from "./components/Navigation";
 import VerificationPage from "./pages/VerificationPage";
 import ResetPassword from "./pages/ResetPassword";
 import ChangePassword from "./pages/ChangePassword";
+import Products from './pages/admin/Products';
+import Parcels from './pages/admin/Parcels';
 
 function App() {
   //Get global state data
@@ -28,7 +31,7 @@ function App() {
   //Dispatch
   const dispatch = useDispatch();
 
-  //Check token
+  //Check token 
   useEffect(() => {
     if (userLocalStorage) {
       //If token exist, keep user logged in (decode token and save loginData to global state)
@@ -52,6 +55,8 @@ function App() {
           <Route component={ResetPassword} path="/reset-password/:token" />
           <Route component={ChangePassword} path="/change-password/" />
           <Route component={Home} path="/" exact />
+          <Route component={Products} path="/admin/products" />
+          <Route component={Parcels} path="/admin/parcels" />
         </Switch>
       </BrowserRouter>
     );
