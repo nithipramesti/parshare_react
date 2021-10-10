@@ -1,6 +1,6 @@
 import "../assets/styles/login.css";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, Redirect } from "react-router-dom";
 
@@ -13,53 +13,73 @@ function Login() {
   //Dispatch
   const dispatch = useDispatch();
 
-  //Local state
-  let [loginData, setLoginData] = useState({});
-  let [errMessage, setErrMessage] = useState("");
-  let [formValid, setFormValid] = useState({ email: true, password: true });
+  //State for input values
+  let [inputValues, setInputValues] = useState({
+    email: "",
+    password: "",
+  });
+
+  //State for handling validation error
+  let [errors, setErrors] = useState({});
+
+  //State to indicate wether form is submitting or not
+  let [isSubmitting, setIsSubmitting] = useState(false);
+
+  //State to handling success/error message from backend
+  let [resMessage, setResMessage] = useState({ success: "", error: "" });
 
   //Function for onChange in input form
-  const inputHandler = (event) => {
-    //Clear form validation alert
-    if (!(loginData.email && loginData.password)) {
-      setFormValid({ email: true, password: true }); //resetting only when the form invalid before
-    }
+  const inputHandler = (e) => {
+    //Save input value to state
+    const { name, value } = e.target;
+    setInputValues({ ...inputValues, [name]: value });
 
-    //Save input form data to state
-    const value = event.target.value;
-    const name = event.target.name;
-    setLoginData({ ...loginData, [name]: value });
-  };
-
-  //Login button
-  const onBtnLogin = () => {
-    if (loginData.email && loginData.password) {
-      //Login user & save token to local storage (or get error message from BE)
-      LoginAction(dispatch, loginData, setErrMessage);
-
-      //Reset form input (controlled form)
-      setLoginData({ email: "", password: "" });
-    } else {
-      //If there an empty form:
-
-      //make new variables to not trigger state
-      let email = true;
-      let password = true;
-
-      //if email form empty
-      if (!loginData.email) {
-        email = false;
-      }
-
-      //if password form empty
-      if (!loginData.password) {
-        password = false;
-      }
-
-      //set state to trigger rerender and show alert
-      setFormValid({ email, password });
+    //Reset alert from backend
+    if (resMessage.error) {
+      setResMessage({ ...resMessage, error: "" });
     }
   };
+
+  //Function to save validate info
+  const validateInfo = (values) => {
+    let errors = {};
+
+    //email valdiation
+    if (!values.email) {
+      errors.email = "Please insert your email";
+    } else if (!/\S+@\S+\.\S+/.test(values.email)) {
+      errors.email = "Email is invalid";
+    }
+
+    //password validation
+    if (!values.password) {
+      errors.password = "Please insert your password";
+    }
+
+    return errors;
+  };
+
+  //Function when submitting form
+  const submitHandler = (e) => {
+    e.preventDefault();
+
+    setErrors(validateInfo(inputValues)); //trigger state to display validation alert
+    setIsSubmitting(true);
+  };
+
+  //Function
+  useEffect(() => {
+    if (Object.keys(errors).length === 0 && isSubmitting) {
+      //Login action
+      LoginAction(
+        dispatch,
+        inputValues,
+        setInputValues,
+        resMessage,
+        setResMessage
+      );
+    }
+  }, [errors]);
 
   if (authReducer.role === "user") {
     //if role is 'user', redirect to home page
@@ -74,31 +94,31 @@ function Login() {
           <div className="col col-right d-flex flex-column justify-content-center">
             <div className="container-login container d-flex flex-column align-items-center">
               <h1 className="mb-5 fw-bold">Login</h1>
-              {errMessage && loginData.email && loginData.password ? (
+              {resMessage.error && (
                 <div className="alert alert-danger" role="alert">
-                  {errMessage}
+                  {resMessage.error}
                 </div>
-              ) : null}
-              <form>
+              )}
+              <form onSubmit={submitHandler} noValidate>
                 <div className="mb-3">
                   <label htmlFor="form-email" className="form-label">
                     Email
                   </label>
                   <input
                     id="form-email"
-                    type="text"
+                    type="email"
                     className={`form-control ${
-                      !formValid.email ? `is-invalid` : null
+                      errors.email ? `is-invalid` : null
                     }`}
                     placeholder="Email"
                     name="email"
-                    value={loginData.email}
+                    value={inputValues.email}
                     onChange={inputHandler}
                     required
                   />
-                  {!formValid.email ? (
-                    <div className="text-danger">Please enter your email</div>
-                  ) : null}
+                  {errors.email && (
+                    <div className="text-danger">{errors.email}</div>
+                  )}
                 </div>
                 <div className="mb-2">
                   <label htmlFor="form-password" className="form-label">
@@ -108,19 +128,19 @@ function Login() {
                     id="form-password"
                     type="password"
                     className={`form-control ${
-                      !formValid.password ? `is-invalid` : null
+                      errors.password ? `is-invalid` : null
                     }`}
                     placeholder="Password"
                     name="password"
-                    value={loginData.password}
+                    value={inputValues.password}
                     onChange={inputHandler}
                     required
                   />
-                  {!formValid.password ? (
+                  {errors.password && (
                     <div className="text-danger">
                       Please enter your password
                     </div>
-                  ) : null}
+                  )}
                 </div>
                 <div className="mb-3 text-end">
                   <Link className="link-primary text-end" to="/forgot-password">
@@ -129,10 +149,9 @@ function Login() {
                 </div>
                 <div className="mb-4 container-fluid p-0"></div>
                 <input
-                  type="button"
+                  type="submit"
                   value="Login"
                   className="btn btn-primary py-2 container-fluid mb-3"
-                  onClick={onBtnLogin}
                 />
               </form>
 
