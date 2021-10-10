@@ -3,17 +3,21 @@ import Axios from "axios";
 import { API_URL } from "../../data/API";
 
 //LOGIN
-export const LoginAction = (dispatch, loginData, setErrMessage) => {
-  //reset errMessage
-  setErrMessage("");
-
+export const LoginAction = (
+  dispatch,
+  inputValues,
+  setInputValues,
+  resMessage,
+  setResMessage
+) => {
+  //Send request to backend
   Axios.post(`${API_URL}/users/login`, {
-    email: loginData.email,
-    password: loginData.password,
+    email: inputValues.email,
+    password: inputValues.password,
   })
     .then((res) => {
       if (res.data.errMessage) {
-        setErrMessage(res.data.errMessage);
+        setResMessage({ ...resMessage, error: res.data.errMessage });
       } else {
         //delete password user
         delete res.data.dataLogin.password;
@@ -30,9 +34,17 @@ export const LoginAction = (dispatch, loginData, setErrMessage) => {
         console.log(
           `User '${res.data.dataLogin.username}' successfully logged in`
         );
+
+        //Reset form input (controlled form)
+        setInputValues({ email: "", password: "" });
       }
     })
-    .catch((err) => console.log(err));
+    .catch((err) =>
+      setResMessage({
+        ...resMessage,
+        error: "Server error, please try again later",
+      })
+    );
 };
 
 //KEEP LOGIN
