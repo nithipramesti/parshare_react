@@ -81,7 +81,7 @@ function Navigation() {
         <Link to="/" className="nav-link">
           Stats
         </Link>
-        <Link to="/" className="nav-link">
+        <Link to="/" className="nav-link" onClick={onBtnLogout}>
           Log Out
         </Link>
       </Nav>

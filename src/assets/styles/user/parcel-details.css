@@ -1,0 +1,46 @@
+.parcel-detail {
+  padding: 120px 0;
+  width: 1250px;
+  margin: 0 auto;
+}
+
+.products-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.product-card button {
+  width: 100%;
+}
+
+.product-card img {
+  height: 200px;
+  width: 200px;
+  margin: 0 auto;
+}
+
+.addedProducts {
+  display: flex;
+}
+
+.addedProducts img {
+  width: 90px;
+  height: 90px;
+  margin-right: 10px;
+}
+
+/* BOOTSTRAP */
+.btn-outline-primary,
+.btn-outline-primary:focus,
+.btn-outline-primary:visited {
+  color: #041e43;
+  border-color: #041e43;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:active {
+  color: #ffffff;
+  border-color: #041e43;
+  background-color: #041e43;
+}
