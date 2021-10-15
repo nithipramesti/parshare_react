@@ -45,7 +45,7 @@ function Navigation() {
             </Link>
           </NavDropdown.Item>
           <NavDropdown.Item>
-            <Link to="/" style={{ color: "inherit", textDecoration: "none" }}>
+            <Link to="/profile" style={{ color: "inherit", textDecoration: "none" }}>
               Account Setting
             </Link>
           </NavDropdown.Item>

@@ -17,9 +17,10 @@ import Navigation from "./components/Navigation";
 import VerificationPage from "./pages/VerificationPage";
 import ResetPassword from "./pages/ResetPassword";
 import ChangePassword from "./pages/ChangePassword";
-import Products from "./pages/admin/Products";
-import Parcels from "./pages/admin/Parcels";
-import Transactions from "./pages/user/Transactions";
+import Products from './pages/admin/Products';
+import Parcels from './pages/admin/Parcels';
+import Transactions from './pages/user/Transactions';
+import Profile from "./pages/Profile";
 import ParcelDetails from "./pages/user/ParcelDetails";
 
 function App() {
@@ -52,6 +53,7 @@ function App() {
           <Route component={Home} path="/" exact />
           <Route component={Login} path="/login" />
           <Route component={Register} path="/register" />
+          <Route component={Profile} path="/profile" />
           <Route component={VerificationPage} path="/authentication/:token" />
           <Route component={ForgotPassword} path="/forgot-password" />
           <Route component={ResetPassword} path="/reset-password/:token" />
@@ -63,7 +65,8 @@ function App() {
         </Switch>
       </BrowserRouter>
     );
-  } else {
+  } 
+  else {
     return <div>Loading data...</div>; //if local storage not checked yet (checkStorage: 'false' in global state)
   }
 }

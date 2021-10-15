@@ -20,6 +20,8 @@ export default (state = INITIAL_STATE, action) => {
       return { ...INITIAL_STATE, storageIsChecked: true };
     case "CHECK_STORAGE":
       return { ...state, storageIsChecked: true };
+    case "UPDATE_PROFILE":
+      return { ...state,...action.payload, storageIsChecked: true };
     default:
       return state;
   }
