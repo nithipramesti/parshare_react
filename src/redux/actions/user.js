@@ -92,3 +92,35 @@ export const logoutAction = (dispatch) => {
     type: "USER_LOGOUT",
   });
 };
+
+export const editProfileAction = (dispatch,inputValues,setInputValues,resMessage,setResMessage) => {
+  Axios.patch(`${API_URL}/users/updateprofile`, {
+    id_user : inputValues.id_user,
+    fullname : inputValues.fullname,
+    gender : inputValues.gender,
+    birthdate : inputValues.birthdate,
+    address : inputValues.address
+  })
+  .then((result) => {
+    if (result.data.errMessage) {
+      setResMessage({ ...resMessage, error: result.data.error });
+    } else{
+      console.log(result.data)
+      dispatch({
+        type: "UPDATE_PROFILE",
+        payload : result.data.data
+      })
+      localStorage.setItem("token_parshare", result.data.token)
+  
+      setResMessage({ 
+        success: true
+      });
+    }
+  })
+  .catch((err) => {
+    setResMessage({
+      ...resMessage,
+      error: "Server error, please try again later",
+    })
+  })
+}
