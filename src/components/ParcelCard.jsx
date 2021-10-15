@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function ParcelCard(props) {
   let parcelData = props.parcelData;
 
@@ -7,12 +9,17 @@ function ParcelCard(props) {
       <div className="card-body">
         <h5 className="card-title mb-0">{parcelData.parcel_name}</h5>
         <p className="card-text mb-2">
-          <small class="text-muted">{parcelData.categories.join(", ")}</small>
+          <small className="text-muted">
+            {parcelData.categories.join(", ")}
+          </small>
         </p>
         <p className="card-text">Rp 120.000</p>
-        <a href="#" className="btn btn-primary">
+        <Link
+          to={`/parcel/${parcelData.id_parcel}`}
+          className="btn btn-primary"
+        >
           See Details
-        </a>
+        </Link>
       </div>
     </div>
   );

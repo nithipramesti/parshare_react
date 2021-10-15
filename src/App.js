@@ -12,7 +12,6 @@ import { KeepLoginAction, CheckStorageAction } from "./redux/actions/user";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Test from "./pages/Test";
 import ForgotPassword from "./pages/ForgotPassword";
 import Navigation from "./components/Navigation";
 import VerificationPage from "./pages/VerificationPage";
@@ -22,6 +21,7 @@ import Products from './pages/admin/Products';
 import Parcels from './pages/admin/Parcels';
 import Transactions from './pages/user/Transactions';
 import Profile from "./pages/Profile";
+import ParcelDetails from "./pages/user/ParcelDetails";
 
 function App() {
   //Get global state data
@@ -33,7 +33,7 @@ function App() {
   //Dispatch
   const dispatch = useDispatch();
 
-  //Check token 
+  //Check token
   useEffect(() => {
     if (userLocalStorage) {
       //If token exist, keep user logged in (decode token and save loginData to global state)
@@ -50,6 +50,7 @@ function App() {
       <BrowserRouter>
         <Navigation />
         <Switch>
+          <Route component={Home} path="/" exact />
           <Route component={Login} path="/login" />
           <Route component={Register} path="/register" />
           <Route component={Profile} path="/profile" />
@@ -57,7 +58,7 @@ function App() {
           <Route component={ForgotPassword} path="/forgot-password" />
           <Route component={ResetPassword} path="/reset-password/:token" />
           <Route component={ChangePassword} path="/change-password/" />
-          <Route component={Home} path="/" exact />
+          <Route component={ParcelDetails} path="/parcel/:id_parcel" />
           <Route component={Products} path="/admin/products" />
           <Route component={Parcels} path="/admin/parcels" />
           <Route component={Transactions} path="/user/transactions" />
