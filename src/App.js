@@ -21,6 +21,7 @@ import Products from "./pages/admin/Products";
 import Parcels from "./pages/admin/Parcels";
 import Transactions from "./pages/user/Transactions";
 import ParcelDetails from "./pages/user/ParcelDetails";
+import Cart from "./pages/user/Cart";
 
 function App() {
   //Get global state data
@@ -59,6 +60,7 @@ function App() {
           <Route component={ParcelDetails} path="/parcel/:id_parcel" />
           <Route component={Products} path="/admin/products" />
           <Route component={Parcels} path="/admin/parcels" />
+          <Route component={Cart} path="/user/cart" />
           <Route component={Transactions} path="/user/transactions" />
         </Switch>
       </BrowserRouter>

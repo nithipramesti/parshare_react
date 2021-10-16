@@ -10,6 +10,7 @@ import { logoutAction } from "../redux/actions/user";
 function Navigation() {
   //Get global state data
   const authReducer = useSelector((state) => state.authReducer);
+  const cartReducer = useSelector((state) => state.cartReducer);
 
   //Get dispatch
   const dispatch = useDispatch();
@@ -23,11 +24,14 @@ function Navigation() {
   const renderNavUser = () => {
     return (
       <Nav className="justify-content-end">
-        <Link to="/login" className="nav-link">
+        <Link to="/user/cart" className="nav-link">
           <i className="bi bi-cart3 icon-cart">
-            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-              9<span className="visually-hidden">cart items</span>
-            </span>
+            {cartReducer.cart_qty !== 0 && (
+              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {cartReducer.cart_qty}
+                <span className="visually-hidden">cart items</span>
+              </span>
+            )}
           </i>
         </Link>
         <NavDropdown
