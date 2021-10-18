@@ -1,10 +1,16 @@
+import { API_URL } from "../data/API";
+
 function ProductCard(props) {
   let productData = props.productData;
   //{productData.image_product}
 
   return (
     <div className="product-card card">
-      <img className="p-4" src={productData.image_product} alt="" />
+      <img
+        className="mt-4 mb-2"
+        src={`${API_URL}/${productData.image_product}`}
+        alt=""
+      />
       <div className="card-body">
         <h6 className="card-title mb-1">{productData.product_name}</h6>
         <p className="card-text mb-2 d-flex justify-content-between">
