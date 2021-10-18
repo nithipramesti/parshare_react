@@ -8,7 +8,7 @@ const INITIAL_STATE = {
   fullname: "",
   address: "",
   birthdate: "",
-  pitcure_link: "",
+  picture_link: "",
   storageIsChecked: false,
 };
 
@@ -21,6 +21,8 @@ export default (state = INITIAL_STATE, action) => {
     case "CHECK_STORAGE":
       return { ...state, storageIsChecked: true };
     case "UPDATE_PROFILE":
+      return { ...state,...action.payload, storageIsChecked: true };
+    case "UPDATE_PROFILE_PICTURE":
       return { ...state,...action.payload, storageIsChecked: true };
     default:
       return state;
