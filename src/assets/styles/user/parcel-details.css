@@ -25,9 +25,35 @@
 }
 
 .addedProducts img {
-  width: 90px;
-  height: 90px;
+  width: 80px;
+  height: 80px;
   margin-right: 10px;
+}
+
+.addedProducts .product-detail,
+.addedProducts .top {
+  width: 100%;
+}
+
+.addedProducts input[type="number"]::-webkit-inner-spin-button,
+.addedProducts input[type="number"]::-webkit-outer-spin-button {
+  display: none;
+}
+
+.addedProducts .quantity input {
+  width: 26px;
+  height: 26px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.addedProducts .quantity a {
+  text-decoration: none;
+  color: #041e43;
+}
+
+.addedProducts .btn-close {
+  font-size: 11px;
 }
 
 /* BOOTSTRAP */
@@ -43,4 +69,16 @@
   color: #ffffff;
   border-color: #041e43;
   background-color: #041e43;
+}
+
+.btn-primary,
+.btn-primary:focus,
+.btn-primary:visited {
+  border: none;
+  background-color: #041e43;
+}
+
+.btn-primary:hover,
+.btn-primary:active {
+  background-color: #314c72;
 }
