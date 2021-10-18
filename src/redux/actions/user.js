@@ -99,7 +99,8 @@ export const editProfileAction = (dispatch,inputValues,setInputValues,resMessage
     fullname : inputValues.fullname,
     gender : inputValues.gender,
     birthdate : inputValues.birthdate,
-    address : inputValues.address
+    address : inputValues.address,
+    picture_link : inputValues.picture_link
   })
   .then((result) => {
     if (result.data.errMessage) {
@@ -108,6 +109,44 @@ export const editProfileAction = (dispatch,inputValues,setInputValues,resMessage
       console.log(result.data)
       dispatch({
         type: "UPDATE_PROFILE",
+        payload : result.data.data
+      })
+      localStorage.setItem("token_parshare", result.data.token)
+  
+      setResMessage({ 
+        success: true
+      });
+    }
+  })
+  .catch((err) => {
+    setResMessage({
+      ...resMessage,
+      error: "Server error, please try again later",
+    })
+  })
+}
+
+export const editProfilePict = (dispatch,inputValues,setInputValues,resMessage,setResMessage) => {
+  let {id_user,fullname,gender,birthdate,address,picture_link} = inputValues
+  let formData = new FormData();
+  let obj = {
+    id_user
+  }
+
+  console.log(`input data : ${picture_link}`)
+  console.log(`obj : ${obj.id_user}`)
+
+  formData.append('data',JSON.stringify(obj))
+  formData.append('file',picture_link)
+
+  Axios.patch(`${API_URL}/users/uploadprofile`, formData)
+  .then((result) => {
+    if (result.data.errMessage) {
+      setResMessage({ ...resMessage, error: result.data.error });
+    } else{
+      console.log(result.data)
+      dispatch({
+        type: "UPDATE_PROFILE_PICTURE",
         payload : result.data.data
       })
       localStorage.setItem("token_parshare", result.data.token)

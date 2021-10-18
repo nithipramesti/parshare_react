@@ -1,11 +1,11 @@
-import photo from '../assets/images/photoexample.png';
+import photo from '../assets/images/defaultPP.jpeg';
 import '../assets/styles/profile.css'
 import Axios from "axios";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
 import { API_URL } from "../data/API";
-import { editProfileAction } from "../redux/actions/user";
+import { editProfileAction, editProfilePict } from "../redux/actions/user";
 
 function Profile(props){
     
@@ -18,7 +18,8 @@ function Profile(props){
         fullname: authReducer.fullname,
         gender: authReducer.gender,
         birthdate: authReducer.birthdate,
-        address: authReducer.address
+        address: authReducer.address,
+        picture_link : authReducer.picture_link
     });
 
     let [errors, setErrors] = useState({})
@@ -26,6 +27,7 @@ function Profile(props){
     
     let [isSubmitting, setIsSubmitting] = useState(false)
 
+    let [isSubmittedPhoto, setIsSubmittedPhoto] = useState(false)
     
     let [resMessage, setResMessage] = useState({ success: false, error: "" })
 
@@ -71,6 +73,25 @@ function Profile(props){
         setIsSubmitting(true)
     };
 
+    const inputImageHandler = (e) => {
+        if(e.target.files[0]){
+          setInputProfile({ ...inputProfile, picture_link: e.target.files[0] })
+          let preview = document.getElementById("preview")
+          preview.src = URL.createObjectURL(e.target.files[0])
+        }
+      }
+    const addProfilePict = () => {
+        if(inputProfile.picture_link){
+            editProfilePict(dispatch,inputProfile,setInputProfile,resMessage,setResMessage)
+        }else{
+            setResMessage({
+                success : false,
+                error : "Empty Photo"
+            })
+        }
+    }
+    
+
     useEffect(() => {
         console.log(authReducer)
         if (Object.keys(errors).length === 0 && isSubmitting) {
@@ -97,10 +118,25 @@ function Profile(props){
                     <div className="row">
                         <div className="col-md-3 container-left">
                             <div className="d-flex flex-column">
-                                <div className="mb-3">
-                                    <img src={photo} alt="" />
+                                <div className="container">
+                                    {authReducer.picture_link ? (
+                                        <img src={`${API_URL}/${authReducer.picture_link}`} width="200px" height="200px" id="preview" style={{display: "inline-block"}}></img>
+                                    ) : <img src={photo} id="preview" width="200px" height="200px" style={{display: "inline-block"}}></img>
+                                    }
+                                    <div className="mt-3 d-flex justify-content-center align-item-center">
+                                        <input
+                                        type="file"
+                                        className="btn"
+                                        name="picture_link"
+                                        onChange={inputImageHandler}
+                                        required
+                                        />
+                                    </div>
+                                    <div className="d-flex justify-content-center align-item-center">
+                                        <button onClick={addProfilePict} className="btn btn-primary">Upload Photo</button>
+                                    </div>
+                                    
                                 </div>
-                                <button className="btn btn-primary"> Upload Photo</button>
                             </div>
                         </div>
                         <div className="col-md-6">
