@@ -44,7 +44,6 @@ function Parcels(){
   const fetchParcel = () => {
     Axios.get(`${API_URL}/parcels/list`)
     .then(res => {
-      console.log(res.data)
       setParcelList(res.data.data)
     })
     .catch(err => {
