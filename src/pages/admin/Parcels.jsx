@@ -119,7 +119,7 @@ function Parcels(){
   const editParcelHandler = (e) => {
     const value = e.target.value;
     const name = e.target.name;
-    setEditParcel({ ...inputParcel, [name]: value });
+    setEditParcel({ ...editParcel, [name]: value });
   }
 
   const finalPriceParcel = () => {
@@ -130,15 +130,42 @@ function Parcels(){
     // console.log(`avgPriceProductCategory : `, avgPriceProductCategory)
     // console.log(`avgPriceProductCategory length : `,avgPriceProductCategory.length)
     for(let i=0;i<selectCategory.length;i++){
-      // console.log(`perulangan i ke ${i}`)
+      console.log(`perulangan i ke ${i}`)
       let id_category_selected = parseInt(selectCategory[i].category)
       let category_quantity_selected = parseInt(selectCategory[i].quantity)
       // console.log(`id_category_selected : `,id_category_selected)
       for(let j=0;j<avgPriceProductCategory.length;j++){
-        // console.log(`perulangan j ke ${j}`)
+        console.log(`perulangan j ke ${j}`)
         if(id_category_selected === avgPriceProductCategory[j].id_category){
           // console.log(`avgPriceProductCategory : `,avgPriceProductCategory[j].average_price)
           // console.log(`selectCategory quantity : `, category_quantity_selected)
+          totalModal = totalModal + (avgPriceProductCategory[j].average_price * category_quantity_selected)
+        }
+      }
+    }
+    console.log(`totalModal : `, totalModal)
+    totalPriceParcel = totalModal + margin
+    console.log(`totalPriceParcel : `, totalPriceParcel)
+    return Math.floor(totalPriceParcel)
+  }
+
+  const finalEditPriceParcel = () => {
+    let totalModal = 0
+    let totalPriceParcel = 0
+    let margin = parseInt(editParcel.margin)
+    console.log(`selectCategory length :`, selectCategory.length)
+    console.log(`avgPriceProductCategory : `, avgPriceProductCategory)
+    console.log(`avgPriceProductCategory length : `,avgPriceProductCategory.length)
+    for(let i=0;i<selectCategory.length;i++){
+      console.log(`perulangan i ke ${i}`)
+      let id_category_selected = parseInt(selectCategory[i].category)
+      let category_quantity_selected = parseInt(selectCategory[i].quantity)
+      console.log(`id_category_selected : `,id_category_selected)
+      for(let j=0;j<avgPriceProductCategory.length;j++){
+        console.log(`perulangan j ke ${j}`)
+        if(id_category_selected === avgPriceProductCategory[j].id_category){
+          console.log(`avgPriceProductCategory : `,avgPriceProductCategory[j].average_price)
+          console.log(`selectCategory quantity : `, category_quantity_selected)
           totalModal = totalModal + (avgPriceProductCategory[j].average_price * category_quantity_selected)
         }
       }
@@ -197,8 +224,9 @@ function Parcels(){
   }
 
   const submitEditParcelHandler = () => {
-    if(editParcel.image && editParcel.name && editParcel.margin && editParcel.description ){
-      let price = finalPriceParcel()
+    console.log(`editParcel :`, editParcel)
+    if(editParcel.id && editParcel.image && editParcel.name && editParcel.margin && editParcel.description ){
+      let price = finalEditPriceParcel()
       console.log(price)
       let formData = new FormData();
       let obj = {
@@ -210,8 +238,8 @@ function Parcels(){
       console.log(`object:${JSON.stringify(obj)}`)
 
       formData.append('data', JSON.stringify(obj));
-      formData.append('file', inputImage.image)
-      Axios.post(`${API_URL}/parcels/add`, formData, {
+      formData.append('file', editImage.image)
+      Axios.patch(`${API_URL}/parcels/edit`, formData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem("token_parshare")}`
         }
@@ -596,7 +624,7 @@ function Parcels(){
               : null
             }
             <div className="container">
-              <img src={`${API_URL}/${editParcel.image}`} width="150px" style={{display: "inline-block"}}></img>
+              <img src={`${API_URL}/${editParcel.image}`} id="edit_preview" width="150px" style={{display: "inline-block"}}></img>
               <img id="edit_preview" width="150px" style={
               editImage.image ?
                 {display: 'inline-block'}
@@ -705,7 +733,7 @@ function Parcels(){
 
             <div className="row">
               <div className="col-md-4">
-                <button type="button" onClick={submitEditParcelHandler} className="btn btn-success w-100 mt-3">Add</button>
+                <button type="button" onClick={submitEditParcelHandler} className="btn btn-success w-100 mt-3">Edit</button>
               </div>
               <div className="col-md-4">
                 <button type="button" onClick={() => deleteParcelHandler(editParcel.id)} className="btn btn-danger w-100 mt-3">Delete</button>
