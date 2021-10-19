@@ -79,6 +79,7 @@
 }
 
 .btn-primary:hover,
-.btn-primary:active {
+.btn-primary:active,
+.btn-primary:disabled {
   background-color: #314c72;
 }

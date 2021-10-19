@@ -28,6 +28,12 @@ function ParcelDetails(props) {
   //State for saving products data
   const [products, setProducts] = useState([]);
 
+  //State for saving filtered products data
+  const [filteredProducts, setFilteredProducts] = useState([]);
+
+  //State for saving category filter
+  const [filterCategory, setFilterCategory] = useState("All");
+
   //State for saving added products & quantity
   const [addedProducts, setAddedProducts] = useState([]);
 
@@ -190,24 +196,39 @@ function ParcelDetails(props) {
       loop = false;
     }
 
-    if (cartReady) {
-      Axios.post(`${API_URL}/cart/add`, {
-        id_user: authReducer.id_user,
-        id_parcel: id_parcel,
-        products: addedProducts,
-      }).then((res) => {
-        alert("Parcel added to cart!");
-        //Set global state
-        // dispatch({
-        //   type: "ADD_CART",
-        // });
-      });
+    if (authReducer.username) {
+      if (cartReady) {
+        Axios.post(`${API_URL}/cart/add`, {
+          id_user: authReducer.id_user,
+          id_parcel: id_parcel,
+          products: addedProducts,
+        }).then((res) => {
+          alert("Parcel added to cart!");
+          //Set global state
+          // dispatch({
+          //   type: "ADD_CART",
+          // });
+        });
+      } else {
+        alert(`Please select ${renderCategories()}`);
+      }
+    } else {
+      alert("Please login first");
     }
   };
 
+  useEffect(() => {
+    let arr = products;
+    if (filterCategory !== "All") {
+      arr = products.filter((val) => val.category === filterCategory);
+      console.log("arr", arr);
+    }
+    setFilteredProducts([...arr]);
+  }, [filterCategory]);
+
   //Render product cards
   const renderProductCards = () => {
-    return products.map((product, index) => {
+    return filteredProducts.map((product, index) => {
       return (
         <ProductCard
           productData={product}
@@ -216,6 +237,30 @@ function ParcelDetails(props) {
         />
       );
     });
+  };
+
+  //Render categories filter
+  const renderCategoriesFilter = () => {
+    let categoriesFilter = ["All", ...Object.keys(parcelData.categories)];
+    return categoriesFilter.map((category) => {
+      return (
+        <button
+          className={`btn p-2 rounded-pill ${
+            filterCategory === category ? `btn-primary` : `btn-outline-primary`
+          } category-active px-3 me-1`}
+          onClick={() => setFilterCategory(category)}
+        >{`${category}`}</button>
+      );
+    });
+  };
+
+  //Function for search input handler
+  const searchInputHandler = (event) => {
+    const searchResult = products.filter((val) => {
+      return val.product_name.toLowerCase().includes(event.target.value);
+    });
+
+    setFilteredProducts([...searchResult]);
   };
 
   //Render added product cards
@@ -249,6 +294,9 @@ function ParcelDetails(props) {
           //Save products data to state
           setProducts(res.data.products);
 
+          //Save products data to state
+          setFilteredProducts(res.data.products);
+
           setIsLoading(false);
         } else {
           console.log(res.data.errMessage);
@@ -276,20 +324,51 @@ function ParcelDetails(props) {
                 {parcelData.categories && renderCategories()}
               </p>
               <p className="">
-                <strong>Rp 120.000</strong>
+                {parcelData.price && (
+                  <strong className="mb-1">Rp {parcelData.price}</strong>
+                )}
               </p>
             </div>
-            <div className="col-4 card">
+
+            <div className="col-4 card p-0">
+              <h5 className="card-header py-3">Added Products</h5>
               <div className="card-body">
-                <h5 className="card-title mt-2 mb-4">Added Products</h5>
-                {renderAddedProductCards()}
+                {addedProducts[0] ? (
+                  renderAddedProductCards()
+                ) : (
+                  <p className="text-muted">Added products will appear here</p>
+                )}
                 <button className="btn btn-primary mt-3" onClick={addToCart}>
                   Add Parcel to Cart
                 </button>
               </div>
             </div>
-            <div className="col-8 products-container">
-              {renderProductCards()}
+            <div className="col-8">
+              <div className="filter d-flex justify-content-between">
+                <div className="d-flex">{renderCategoriesFilter()}</div>
+                {/* <select
+                className="form-select"
+                aria-label="Default select example"
+                onChange={(e) => setFilterCategory(e.target.value)}
+              >
+                <option value="" selected>
+                  All Categories
+                </option>
+                <option value="Chocolate">Chocolate</option>
+                <option value="Snack">Snack</option>
+              </select> */}
+                <div className="search-filter d-flex mb-3">
+                  <input
+                    type="email"
+                    className="form-control"
+                    name="searchInput"
+                    onChange={searchInputHandler}
+                    placeholder="Search product"
+                    size="25"
+                  />
+                </div>
+              </div>
+              <div className="products-container">{renderProductCards()}</div>
             </div>
           </div>
         </div>
