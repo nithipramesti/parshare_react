@@ -14,10 +14,25 @@
   width: 100%;
 }
 
+.product-card .card-title {
+  cursor: pointer;
+}
+
+.product-card .card-title:hover {
+  text-decoration: underline;
+}
+
 .product-card img {
+  cursor: pointer;
   height: 200px;
   width: 200px;
   margin: 0 auto;
+  transition: transform 0.2s;
+  transition-timing-function: ease;
+}
+
+.product-card img:hover {
+  transform: scale(107%);
 }
 
 .addedProducts {
@@ -56,6 +71,27 @@
   font-size: 11px;
 }
 
+.parcel-detail {
+  position: relative;
+}
+
+.details-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  width: 100vw;
+  height: 100vh;
+}
+
+.parcel-detail .modal {
+  width: 800px;
+}
+
+.modal-body img {
+  height: 400px;
+}
+
 /* BOOTSTRAP */
 .btn-outline-primary,
 .btn-outline-primary:focus,
@@ -79,6 +115,7 @@
 }
 
 .btn-primary:hover,
-.btn-primary:active {
+.btn-primary:active,
+.btn-primary:disabled {
   background-color: #314c72;
 }
