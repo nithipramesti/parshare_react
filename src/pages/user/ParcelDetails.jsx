@@ -37,6 +37,12 @@ function ParcelDetails(props) {
   //State for saving added products & quantity
   const [addedProducts, setAddedProducts] = useState([]);
 
+  //State for product details modal
+  const [modalToggle, setModalToggle] = useState({
+    displayed: false,
+    product: {},
+  });
+
   //Render categories & quantity
   const renderCategories = () => {
     let categoriesString = [];
@@ -217,6 +223,66 @@ function ParcelDetails(props) {
     }
   };
 
+  //Function to render product details
+  const renderProductDetails = () => {
+    if (modalToggle.displayed) {
+      return (
+        <div
+          className={`details-bg ${!modalToggle.displayed && `modal`} m-0 p-0`}
+          tabindex="-1"
+        >
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  {modalToggle.product.product_name}
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setModalToggle(false)}
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className="modal-body d-flex">
+                {/* <img
+                  src={`${API_URL}/${modalToggle.product.image_product}`}
+                  alt=""
+                /> */}
+                <div className="info-text">
+                  <p>
+                    <strong>Category: </strong> {modalToggle.product.category}
+                  </p>
+                  <p>
+                    <strong>Description:</strong>
+                    <br />
+                    {modalToggle.product.description}
+                  </p>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setModalToggle(false)}
+                >
+                  Close
+                </button>
+                <button type="button" className="btn btn-primary">
+                  Add Product
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  };
+
+  const displayModal = (product) => {
+    setModalToggle({ displayed: true, product });
+  };
+
   useEffect(() => {
     let arr = products;
     if (filterCategory !== "All") {
@@ -234,6 +300,7 @@ function ParcelDetails(props) {
           productData={product}
           addProduct={addProduct}
           index={index}
+          displayModal={displayModal}
         />
       );
     });
@@ -325,7 +392,9 @@ function ParcelDetails(props) {
               </p>
               <p className="">
                 {parcelData.price && (
-                  <strong className="mb-1">Rp {parcelData.price}</strong>
+                  <strong className="mb-1">
+                    Rp {parcelData.price.toLocaleString()}
+                  </strong>
                 )}
               </p>
             </div>
@@ -364,7 +433,6 @@ function ParcelDetails(props) {
                     name="searchInput"
                     onChange={searchInputHandler}
                     placeholder="Search product"
-                    size="25"
                   />
                 </div>
               </div>
@@ -372,6 +440,7 @@ function ParcelDetails(props) {
             </div>
           </div>
         </div>
+        {renderProductDetails()}
       </div>
     );
   }
