@@ -12,7 +12,7 @@ function Parcels(){
   const [ parcelList, setParcelList ] = useState([])
   const [ selectCategory, setSelectCategory ] = useState([]);
   const [ selectEditCategory, setSelectEditCategory ] = useState([]);
-  const [ avgPriceProductCategory, setAvgPriceProductCategory] = useState([{"id_category":1,"category":"Chocolate","average_price":79000},{"id_category":2,"category":"Snack","average_price":43666.6667},{"id_category":3,"category":"Coffee","average_price":92000},{"id_category":4,"category":"Tea","average_price":46000},{"id_category":5,"category":"Soft Drink","average_price":16000}]);
+  const [ avgPriceProductCategory, setAvgPriceProductCategory] = useState([]);
   const [ showAlert, setShowAlert ] = useState({});
   const [ showAddParcel, setShowAddParcel ] = useState(false);
   const [ inputImage, setInputImage ] = useState({});
@@ -32,14 +32,14 @@ function Parcels(){
     })
   }
 
-  // const fetchAveragePriceProductCategory = () => {
-  //   Axios.get(`${API_URL}/categories/average`)
-  //   .then(res => {
-  //     setAvgPriceProductCategory( res.data.data )
-  //   })
-  //   .catch(err => {
-  //   })
-  // }
+  const fetchAveragePriceProductCategory = () => {
+    Axios.get(`${API_URL}/categories/average`)
+    .then(res => {
+      setAvgPriceProductCategory( res.data.data )
+    })
+    .catch(err => {
+    })
+  }
 
   const fetchParcel = () => {
     Axios.get(`${API_URL}/parcels/list`)
@@ -54,7 +54,7 @@ function Parcels(){
   useEffect(() => {
     fetchParcel();
     fetchCategory();
-    // fetchAveragePriceProductCategory();
+    fetchAveragePriceProductCategory();
   }, [])
 
   const handleSelectCategory = (e, index) => {
