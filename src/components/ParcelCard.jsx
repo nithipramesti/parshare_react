@@ -13,7 +13,9 @@ function ParcelCard(props) {
             {parcelData.categories.join(", ")}
           </small>
         </p>
-        <p className="card-text">Rp 120.000</p>
+        <p className="card-text">
+          Rp {parcelData.parcel_price.toLocaleString()}
+        </p>
         <Link
           to={`/parcel/${parcelData.id_parcel}`}
           className="btn btn-primary"
