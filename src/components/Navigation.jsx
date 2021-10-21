@@ -49,7 +49,10 @@ function Navigation() {
             </Link>
           </NavDropdown.Item>
           <NavDropdown.Item>
-            <Link to="/profile" style={{ color: "inherit", textDecoration: "none" }}>
+            <Link
+              to="/profile"
+              style={{ color: "inherit", textDecoration: "none" }}
+            >
               Account Setting
             </Link>
           </NavDropdown.Item>
@@ -73,21 +76,48 @@ function Navigation() {
   const renderNavAdmin = () => {
     return (
       <Nav className="justify-content-end">
-        <Link to="/" className="nav-link">
-          Parcels
-        </Link>
-        <Link to="/" className="nav-link">
-          Products
-        </Link>
-        <Link to="/" className="nav-link">
-          Transactions
-        </Link>
-        <Link to="/" className="nav-link">
-          Stats
-        </Link>
-        <Link to="/" className="nav-link" onClick={onBtnLogout}>
-          Log Out
-        </Link>
+        <NavDropdown
+          title={
+            <>
+              <i className="bi bi-person-circle icon-account"></i>
+              <span>Admin</span>
+            </>
+          }
+          id="basic-nav-dropdown"
+        >
+          <NavDropdown.Item href="#action/3.2">
+            <Link
+              to="/admin/parcels"
+              style={{ color: "inherit", textDecoration: "none" }}
+            >
+              Parcels
+            </Link>
+          </NavDropdown.Item>
+          <NavDropdown.Item>
+            <Link
+              to="/admin/products"
+              style={{ color: "inherit", textDecoration: "none" }}
+            >
+              Products
+            </Link>
+          </NavDropdown.Item>
+          <NavDropdown.Item>
+            <Link
+              to="/admin/transactions"
+              style={{ color: "inherit", textDecoration: "none" }}
+            >
+              Transactions
+            </Link>
+          </NavDropdown.Item>
+          <NavDropdown.Item>
+            <Link to="/" style={{ color: "inherit", textDecoration: "none" }}>
+              Stats
+            </Link>
+          </NavDropdown.Item>
+
+          <NavDropdown.Divider />
+          <NavDropdown.Item onClick={onBtnLogout}>Log Out</NavDropdown.Item>
+        </NavDropdown>
       </Nav>
     );
   };
