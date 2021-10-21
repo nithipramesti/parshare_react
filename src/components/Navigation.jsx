@@ -73,7 +73,7 @@ function Navigation() {
   const renderNavAdmin = () => {
     return (
       <Nav className="justify-content-end">
-        <Link to="/" className="nav-link">
+        <Link to="/admin/parcels" className="nav-link">
           Parcels
         </Link>
         <Link to="/" className="nav-link">

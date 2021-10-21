@@ -125,19 +125,19 @@ function Parcels(){
     let totalModal = 0
     let totalPriceParcel = 0
     let margin = parseInt(inputParcel.margin)
-    // console.log(`selectCategory length :`, selectCategory.length)
-    // console.log(`avgPriceProductCategory : `, avgPriceProductCategory)
-    // console.log(`avgPriceProductCategory length : `,avgPriceProductCategory.length)
+    console.log(`selectCategory length :`, selectCategory.length)
+    console.log(`avgPriceProductCategory : `, avgPriceProductCategory)
+    console.log(`avgPriceProductCategory length : `,avgPriceProductCategory.length)
     for(let i=0;i<selectCategory.length;i++){
       console.log(`perulangan i ke ${i}`)
       let id_category_selected = parseInt(selectCategory[i].category)
       let category_quantity_selected = parseInt(selectCategory[i].quantity)
-      // console.log(`id_category_selected : `,id_category_selected)
+      console.log(`id_category_selected : `,id_category_selected)
       for(let j=0;j<avgPriceProductCategory.length;j++){
         console.log(`perulangan j ke ${j}`)
         if(id_category_selected === avgPriceProductCategory[j].id_category){
-          // console.log(`avgPriceProductCategory : `,avgPriceProductCategory[j].average_price)
-          // console.log(`selectCategory quantity : `, category_quantity_selected)
+          console.log(`avgPriceProductCategory : `,avgPriceProductCategory[j].average_price)
+          console.log(`selectCategory quantity : `, category_quantity_selected)
           totalModal = totalModal + (avgPriceProductCategory[j].average_price * category_quantity_selected)
         }
       }
@@ -186,7 +186,7 @@ function Parcels(){
         ...inputParcel
       }
 
-      console.log(`object:${JSON.stringify(obj)}`)
+      console.log(`objectAdd:${JSON.stringify(obj)}`)
 
       formData.append('data', JSON.stringify(obj));
       formData.append('file', inputImage.image)
@@ -499,7 +499,7 @@ function Parcels(){
                 {display: 'block'}
               : {display: 'none'}
             }>
-              <img id="preview" width="150px"></img>
+              <img id="preview" style={{display: "inline-block"}}></img>
             </div>
             <label htmlFor="form-email" className="form-label">
               Image
@@ -566,6 +566,7 @@ function Parcels(){
                     <div className="col-md-2">
                       <input 
                         type="number"
+                        min="1"
                         class="form-control md-3"
                         name="quantity"
                         onChange={(e) => handleSelectCategory(e, index)}
@@ -623,12 +624,12 @@ function Parcels(){
               : null
             }
             <div className="container">
-              <img src={`${API_URL}/${editParcel.image}`} id="edit_preview" width="150px" style={{display: "inline-block"}}></img>
-              <img id="edit_preview" width="150px" style={
+              <img src={`${API_URL}/${editParcel.image}`} id="edit_preview" style={{display: "inline-block"}}></img>
+              {/* <img id="edit_preview" width="150px" style={
               editImage.image ?
                 {display: 'inline-block'}
               : {display: 'none'}
-              }></img>
+              }></img> */}
             </div>
             <label htmlFor="form-email" className="form-label">
               Image
