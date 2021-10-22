@@ -6,10 +6,13 @@ import { API_URL } from "../../data/API";
 import { compile } from "date-and-time";
 
 export const Transactions = () => {
+  //State to save transaction data
   const [transactionsData, setTransactionsData] = useState([]);
 
+  //State to save filter status
   const [filterStatus, setFilterStatus] = useState("Pending");
 
+  //State to save filtered data
   const [filteredData, setFilteredData] = useState([]);
 
   //State for transaction details modal
