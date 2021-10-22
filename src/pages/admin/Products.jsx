@@ -118,19 +118,50 @@ function Products(){
   const editProductHandler = (e) => {
     const value = e.target.value;
     const name = e.target.name;
-    setEditProduct({ ...inputProduct, [name]: value });
+    setEditProduct({ ...editProduct, [name]: value });
   }
   const submitEditProductHandler = () => {
-    if(editProduct.id && editProduct.name && editProduct.price && editProduct.category && editProduct.quantity){
+    if(editProduct.id && editProduct.name && editProduct.price && editProduct.category && editProduct.quantity && editProduct.image && editImage.image){
       let formData = new FormData();
       let obj = {
         ...editProduct
       }
 
-      formData.append('data', obj);
+      formData.append('data', JSON.stringify(obj));
       formData.append('file', editImage.image);
-      console.log(formData)
       Axios.patch(`${API_URL}/products/edit`, formData, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token_parshare")}`
+        }
+      })
+      .then(res => {
+        setEditImage({});
+        fetchProduct();
+        setShowAlert({
+          show: true,
+          type: "success",
+          message: "Edit product succeed"
+        })
+      })
+      .catch(err => {
+        err.response.status === 401 ?
+          window.location.replace("/login")
+        :
+          setShowAlert({
+            show: true,
+            type: "danger",
+            message: err.response.data.data
+          })
+      });
+    }else if(editProduct.id && editProduct.name && editProduct.price && editProduct.category && editProduct.quantity && editProduct.image){
+      let formData = new FormData();
+      let obj = {
+        ...editProduct
+      }
+      delete obj.image;
+
+      formData.append('data', JSON.stringify(obj));
+      Axios.patch(`${API_URL}/products/edit`, obj, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem("token_parshare")}`
         }
@@ -140,7 +171,7 @@ function Products(){
         setShowAlert({
           show: true,
           type: "success",
-          message: "Add product succeed"
+          message: "Edit product succeed"
         })
       })
       .catch(err => {
@@ -360,6 +391,7 @@ function Products(){
     setShowAlert({
       show: false
     })
+    setEditImage({})
     setEditProduct({})
     setShowEditProductModal(false)
   }
@@ -743,7 +775,7 @@ function Products(){
             <label htmlFor="form-email" className="form-label">
               Category
             </label>
-            <select class="form-select" aria-label="Default select example" name="category" onChange={inputProductHandler}>
+            <select class="form-select" aria-label="Default select example" name="category" onChange={editProductHandler}>
               {
                 categoryList.map(category => 
                   category.id_category === editProduct.category ? 
@@ -778,7 +810,7 @@ function Products(){
             />
             <div className="row">
               <div className="col-md-4">
-                <button type="button" onClick={submitEditProductHandler} className="btn btn-success w-100 mt-3">Add</button>
+                <button type="button" onClick={submitEditProductHandler} className="btn btn-success w-100 mt-3">Edit</button>
               </div>
               <div className="col-md-4">
                 <button type="button" onClick={() => deleteProductHandler(editProduct.id)} className="btn btn-danger w-100 mt-3">Delete</button>
