@@ -1,0 +1,144 @@
+.transactions-admin {
+  padding-top: 120px;
+  margin: 0 auto;
+  width: 1200px;
+}
+.nav-link {
+  cursor: pointer;
+}
+
+.parcel-info {
+  width: 80%;
+  margin-right: 50px;
+}
+
+.parcel-info img {
+  width: 140px;
+}
+
+.transactions-products {
+  font-size: 13px;
+}
+.see-details {
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.revenue-status {
+  width: 20%;
+  text-align: center;
+  border-left: 1px solid #dee2e7;
+}
+
+.modal-dialog {
+  width: 900px;
+  max-width: none;
+}
+
+.modal-dialog .parcel-product img {
+  width: 100px;
+  height: 100px;
+}
+
+.transaction-info {
+  font-size: 14px;
+}
+
+.transaction-info-1 {
+  width: 65%;
+}
+
+.transaction-info-2 {
+  width: 35%;
+}
+
+.modal-body-left {
+  width: 70%;
+  padding: 0 15px;
+}
+
+.modal-body-right {
+  width: 30%;
+  text-align: center;
+  border-left: 1px solid #dee2e7;
+  font-size: 14px;
+}
+
+.status {
+  display: inline-block;
+  padding: 3px 12px;
+  border: 1px solid;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.status.Pending {
+  border-color: #fcca2b;
+  color: #fcca2b;
+}
+
+.status.Confirmed {
+  border-color: #167248;
+  color: #167248;
+}
+
+.status.Rejected {
+  border-color: #bb2e3b;
+  color: #bb2e3b;
+}
+
+.payment-proof img {
+  width: 150px;
+  height: auto;
+}
+
+.button-container button {
+  width: 170px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.payment-proof-modal {
+  z-index: 999;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  width: 100vw;
+  height: 100vh;
+}
+
+.image-container {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  border-radius: 15px;
+}
+
+.image-container .btn-close {
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+.payment-proof-modal img {
+  height: 80vh;
+  padding: 40px;
+}
+
+/* BOOTSTRAP COMPONENTS */
+a.link-primary {
+  cursor: pointer;
+  color: #314c72;
+}
+
+a.link-primary:hover,
+a.link-primary:active,
+a.link-primary:visited,
+a.link-primary:focus {
+  color: #314c72;
+}

@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
+import { API_URL } from "../data/API";
 
 function ParcelCard(props) {
   let parcelData = props.parcelData;
 
   return (
     <div className="card">
-      <img src={parcelData.image_parcel} alt="" />
+      <img src={`${API_URL}${parcelData.image_parcel}`} alt="" />
       <div className="card-body">
         <h5 className="card-title mb-0">{parcelData.parcel_name}</h5>
         <p className="card-text mb-2">
