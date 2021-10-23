@@ -57,13 +57,26 @@ export const Transactions = () => {
       <AdminTransactionsDetails
         transactionData={filteredData[modalToggle.transactionIndex]}
         setModalToggle={setModalToggle}
+        setTransactionsData={setTransactionsData}
+        setFilteredData={setFilteredData}
       />
     );
   };
 
   //Fetching transaction data
   useEffect(() => {
-    Axios.get(`${API_URL}/transactions/getAll`)
+    //Get user token
+    const userLocalStorage = localStorage.getItem("token_parshare");
+
+    Axios.post(
+      `${API_URL}/transactions/get-all`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${userLocalStorage}`,
+        },
+      }
+    )
       .then((res) => {
         console.log(res.data.transactionsData);
         setTransactionsData([...res.data.transactionsData]);

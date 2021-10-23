@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Axios from "axios";
 import { API_URL } from "../data/API";
 
 export const AdminTransactionsDetails = (props) => {
@@ -76,6 +77,35 @@ export const AdminTransactionsDetails = (props) => {
         </div>
       );
     });
+  };
+
+  //Function for confirm/reject transaction
+  const transactionConfirmation = (newStatus) => {
+    //Get user token
+    const userLocalStorage = localStorage.getItem("token_parshare");
+
+    Axios.patch(
+      `${API_URL}/transactions/confirmation`,
+      {
+        id_transaction,
+        newStatus,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${userLocalStorage}`,
+        },
+      }
+    )
+      .then((res) => {
+        alert("Transaction status changed");
+        console.log(res.data.message);
+
+        //Refresh page
+        window.location.reload(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   ///////////////
@@ -194,10 +224,16 @@ export const AdminTransactionsDetails = (props) => {
                 )}
                 {status === "Pending" && (
                   <div className="button-container mt-3">
-                    <button className="btn btn-success mb-2">
+                    <button
+                      className="btn btn-success mb-2"
+                      onClick={() => transactionConfirmation("Confirmed")}
+                    >
                       Confirm Transaction
                     </button>
-                    <button className="btn btn-danger mb-2">
+                    <button
+                      className="btn btn-danger mb-2"
+                      onClick={() => transactionConfirmation("Rejected")}
+                    >
                       Reject Transaction
                     </button>
                   </div>
