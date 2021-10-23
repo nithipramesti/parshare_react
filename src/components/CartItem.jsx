@@ -1,3 +1,5 @@
+import { API_URL } from "../data/API";
+
 function CartItem(props) {
   const cartItem = props.cartItem;
 
@@ -6,7 +8,7 @@ function CartItem(props) {
       <div className="row g-0">
         <div className="col-md-2">
           <img
-            src={cartItem.image_parcel}
+            src={`${API_URL}${cartItem.image_parcel}`}
             className="img-fluid rounded-start p-2"
             alt=""
           />
