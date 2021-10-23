@@ -15,6 +15,8 @@ function ParcelDetails(props) {
 
   //Global state
   const authReducer = useSelector((state) => state.authReducer);
+  const cartReducer = useSelector((state) => state.cartReducer);
+
 
   //State for loading
   const [isLoading, setIsLoading] = useState(true);
@@ -35,7 +37,7 @@ function ParcelDetails(props) {
   const [filterCategory, setFilterCategory] = useState("All");
 
   //State for saving added products & quantity
-  const [addedProducts, setAddedProducts] = useState([]);
+  const [addedProducts, setAddedProducts] = useState(cartReducer.products);
 
   //State for product details modal
   const [modalToggle, setModalToggle] = useState({
@@ -203,17 +205,54 @@ function ParcelDetails(props) {
     }
 
     if (authReducer.username) {
+      console.log(`addedProducts: `,addedProducts)
       if (cartReady) {
         Axios.post(`${API_URL}/cart/add`, {
           id_user: authReducer.id_user,
           id_parcel: id_parcel,
           products: addedProducts,
         }).then((res) => {
+          console.log(`id_cart:`,res.data.data)
           alert("Parcel added to cart!");
-          //Set global state
-          // dispatch({
-          //   type: "ADD_CART",
-          // });
+          // Set global state
+          dispatch({
+            type: "ADD_CART",
+            payload : {
+              id_parcel : id_parcel,
+              id_cart : res.data.data,
+              products : addedProducts
+            }
+          });
+        });
+      } else {
+        alert(`Please select ${renderCategories()}`);
+      }
+    } else {
+      alert("Please login first");
+    }
+  };
+
+  const editToCart = () => {
+    console.log(`parcelData`, parcelData)
+    console.log(`selectedCategories`, selectedCategories)
+
+    //Get array of categories
+    const categories = Object.keys(parcelData.categories);
+
+    console.log(`selectedCategories2`, selectedCategories)
+
+    let cartReady = true;
+
+    if (authReducer.username) {
+      console.log(`addedProducts: `,addedProducts)
+      if (cartReady) {
+        Axios.patch(`${API_URL}/cart/edit`, {
+          id_user: authReducer.id_user,
+          id_cart : cartReducer.id_cart,
+          id_parcel: id_parcel,
+          products: addedProducts,
+        }).then((res) => {
+          alert("Success Edit");
         });
       } else {
         alert(`Please select ${renderCategories()}`);
@@ -332,8 +371,11 @@ function ParcelDetails(props) {
 
   //Render added product cards
   const renderAddedProductCards = () => {
+    console.log(`addedProduct : `,addedProducts)
+    console.log(`cartReducer: `, cartReducer)
     return addedProducts.map((product, index) => {
       if (product.selected > 0) {
+        console.log(`product:`,product)
         return (
           <AddedProductCard
             productData={product}
@@ -407,9 +449,15 @@ function ParcelDetails(props) {
                 ) : (
                   <p className="text-muted">Added products will appear here</p>
                 )}
-                <button className="btn btn-primary mt-3" onClick={addToCart}>
-                  Add Parcel to Cart
-                </button>
+                {cartReducer.id_cart ? (
+                  <button className="btn btn-primary mt-3" onClick={editToCart}>
+                    Edit Parcel to Cart
+                  </button>
+                ) : (
+                  <button className="btn btn-primary mt-3" onClick={addToCart}>
+                    Add Parcel to Cart
+                  </button>
+                )}
               </div>
             </div>
             <div className="col-8">
