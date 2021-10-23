@@ -696,6 +696,7 @@ function Parcels(){
                     <div className="col-md-2">
                       <input 
                         type="number"
+                        min="1"
                         class="form-control md-3"
                         name="quantity"
                         onChange={(e) => handleSelectCategory(e, index)}
