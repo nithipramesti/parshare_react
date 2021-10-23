@@ -48,13 +48,13 @@ a#btn-main {
 
 /* BOOTSTRAP */
 .btn-primary,
+.btn-primary:focus,
 .btn-primary:visited {
   border: none;
   background-color: #041e43;
 }
 
 .btn-primary:hover,
-.btn-primary:active,
-.btn-primary:focus {
+.btn-primary:active {
   background-color: #314c72;
 }

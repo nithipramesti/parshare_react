@@ -1,0 +1,16 @@
+.container-top{
+  padding-top: 80px;
+}
+.btn-right{
+  float: right;
+  margin-top: 10px;
+}
+.hover-display{
+  display: none;
+}
+.hover-display-parent:hover > .hover-display{
+  display: inline-block;
+}
+.hover-yellow:hover{
+  color: blue;
+}
