@@ -19,6 +19,12 @@ function Cart() {
   //State for saving cart products data
   const [cartItems, setCartItems] = useState([]);
 
+  let transaction_totalprice = 0;
+
+  cartItems.forEach((val) => {
+    transaction_totalprice += val.parcel_price;
+  });
+
   const renderCartItem = () => {
     console.log(`cartItems`, cartItems);
     console.log(`cartReducer`, cartReducer)
@@ -31,10 +37,9 @@ function Cart() {
 
   const checkout = () => {
     const now = new Date();
-    const transaction_date = date.format(now, "YYYY/MM/DD HH:mm:ss");
+    let transaction_date = date.format(now, "YYYY/MM/DD HH:mm:ss");
 
     const income = 5000;
-    const transaction_totalprice = 150000;
 
     Axios.post(`${API_URL}/cart/checkout`, {
       id_user: cartItems[0].id_user,
@@ -106,7 +111,7 @@ function Cart() {
         </div>
         <div className="text-end mt-4">
           <div className="total-price">
-            <strong>Total: Rp 240.000</strong>
+            <strong>{`Rp ${transaction_totalprice.toLocaleString()}`}</strong>
           </div>
           <button className="btn btn-primary mt-3" onClick={checkout}>
             Checkout
