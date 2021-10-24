@@ -3,7 +3,7 @@ import logo from "../assets/images/Logo.png";
 import logoWhite from "../assets/images/Logo-white.png";
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
 
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutAction } from "../redux/actions/user";
 
@@ -17,8 +17,10 @@ function Navigation() {
 
   //Log out user
   const onBtnLogout = () => {
-    logoutAction(dispatch);
+    logoutAction(dispatch, history);
   };
+
+  const history = useHistory();
 
   //Function to render nav links for logged USER
   const renderNavUser = () => {
