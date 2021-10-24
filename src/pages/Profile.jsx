@@ -93,7 +93,6 @@ function Profile(props){
     
 
     useEffect(() => {
-        console.log(authReducer)
         if (Object.keys(errors).length === 0 && isSubmitting) {
           editProfileAction(
             dispatch,

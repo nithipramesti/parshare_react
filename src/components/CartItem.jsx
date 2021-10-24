@@ -38,7 +38,7 @@ function CartItem(props) {
                 </p>
                 <Link
                   to={`/parcel/${cartReducer.id_parcel}/${cartItem.id_cart}`}
-                  className="btn btn-primary"
+                  className="link-primary"
                 >
                   Edit products
                 </Link>
