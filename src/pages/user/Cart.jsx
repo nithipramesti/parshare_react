@@ -9,6 +9,10 @@ import date from "date-and-time";
 function Cart() {
   //Global state
   const authReducer = useSelector((state) => state.authReducer);
+  const cartReducer = useSelector((state) => state.cartReducer)
+
+  //Dispatch
+  const dispatch = useDispatch();
 
   const [cartRaw, setCartRaw] = useState([]);
 
@@ -22,10 +26,12 @@ function Cart() {
   });
 
   const renderCartItem = () => {
-    console.log(cartItems);
+    console.log(`cartItems`, cartItems);
+    console.log(`cartReducer`, cartReducer)
+    console.log(``)
 
     return cartItems.map((val) => {
-      return <CartItem cartItem={val} />;
+      return <CartItem cartItem={val}/>;
     });
   };
 
@@ -84,6 +90,10 @@ function Cart() {
       if (res.data.message) {
         alert(res.data.message);
 
+        dispatch({
+          type: "RESET_CART"
+        });
+
         const emptyAr = [];
         setCartRaw([...emptyAr]);
         setCartItems([...emptyAr]);
@@ -92,6 +102,7 @@ function Cart() {
   };
 
   useEffect(() => {
+    console.log(`cartReducer`, cartReducer)
     Axios.post(`${API_URL}/cart/get`, {
       id_user: authReducer.id_user,
     }).then((res) => {
@@ -103,13 +114,14 @@ function Cart() {
         let index = cartArray.findIndex((el) => el.id_cart === rawObj.id_cart);
 
         if (index === -1) {
-          const { id_cart, id_user, parcel_name, parcel_price, image_parcel } =
+          const {id_parcel, id_cart, id_user, parcel_name, parcel_price, image_parcel } =
             rawObj;
 
           let products = {};
           products[rawObj.product_name] = rawObj.product_quantity;
 
           cartArray.push({
+            id_parcel,
             id_cart,
             id_user,
             parcel_name,
