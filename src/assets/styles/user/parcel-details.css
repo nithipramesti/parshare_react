@@ -4,6 +4,27 @@
   margin: 0 auto;
 }
 
+.breadcrumb-container {
+  position: relative;
+}
+
+.parcel-detail .parcel-info {
+  width: 100%;
+}
+
+.parcel-info .categories {
+  text-transform: uppercase;
+}
+
+.search-filter {
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  right: 10px;
+}
+
 .products-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -67,6 +88,10 @@
   color: #041e43;
 }
 
+.added-product-operator {
+  cursor: pointer;
+}
+
 .addedProducts .btn-close {
   font-size: 11px;
 }
@@ -92,6 +117,14 @@
   height: 400px;
 }
 
+.sort-title {
+  white-space: nowrap;
+}
+
+.pagination-container {
+  width: 100%;
+  margin-left: -3rem;
+}
 /* BOOTSTRAP */
 .btn-outline-primary,
 .btn-outline-primary:focus,

@@ -24,7 +24,7 @@ export const AddedProductCard = (props) => {
           <div className="quantity d-flex align-items-center">
             <a
               onClick={() => props.editQty(props.index, "decrement")}
-              className="fs-5 m-0"
+              className="added-product-operator fs-5 m-0"
             >
               -
             </a>
@@ -35,7 +35,7 @@ export const AddedProductCard = (props) => {
             />
             <a
               onClick={() => props.editQty(props.index, "increment")}
-              className="fs-5 m-0"
+              className="added-product-operator fs-5 m-0"
             >
               +
             </a>
