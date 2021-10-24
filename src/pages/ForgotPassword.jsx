@@ -15,6 +15,7 @@ function ForgotPassword() {
   //State to indicate wether form is submitting or not
   let [isSubmitting, setIsSubmitting] = useState(false);
   let [isSubmitted, setIsSubmitted] = useState(false);
+  let [submitLoading, setSubmitLoading] = useState(false);
 
   //State to handling success/error message from backend
   let [resMessage, setResMessage] = useState({ success: "", error: "" });
@@ -55,11 +56,15 @@ function ForgotPassword() {
   //Function
   useEffect(() => {
     if (Object.keys(errors).length === 0 && isSubmitting) {
+      setSubmitLoading(true);
+
       //Send request to backend
       Axios.post(`${API_URL}/change-password/send-email`, {
         email: inputValues.email,
       })
         .then((res) => {
+          setSubmitLoading(false);
+
           if (res.data.errMessage) {
             setResMessage({ ...resMessage, error: res.data.errMessage });
           } else {
@@ -115,6 +120,17 @@ function ForgotPassword() {
             className="btn btn-primary btn-send py-2 container-fluid mb-3"
           />
         </form>
+        {submitLoading && (
+          <div
+            className="alert alert-secondary mt-3 d-flex justify-content-center pt-3 pb-1"
+            role="alert"
+          >
+            <div className="spinner-border me-1" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <p>Submitting...</p>
+          </div>
+        )}
         {resMessage.success && (
           <div className="alert alert-success mt-3" role="alert">
             {resMessage.success}
