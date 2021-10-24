@@ -1,12 +1,18 @@
+import { API_URL } from "../data/API";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+
 function CartItem(props) {
   const cartItem = props.cartItem;
-
+  
+  const cartReducer = useSelector((state) => state.cartReducer);
+  
   return (
     <li className="list-group-item py-3">
       <div className="row g-0">
         <div className="col-md-2">
           <img
-            src={cartItem.image_parcel}
+            src={`${API_URL}${cartItem.image_parcel}`}
             className="img-fluid rounded-start p-2"
             alt=""
           />
@@ -30,7 +36,12 @@ function CartItem(props) {
                 <p className="mb-1">
                   {Object.keys(cartItem.products).join(", ")}
                 </p>
-                <a href="#">Edit products</a>
+                <Link
+                  to={`/parcel/${cartReducer.id_parcel}/${cartItem.id_cart}`}
+                  className="btn btn-primary"
+                >
+                  Edit products
+                </Link>
               </div>
             </ul>
           </div>

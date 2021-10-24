@@ -9,6 +9,10 @@ import date from "date-and-time";
 function Cart() {
   //Global state
   const authReducer = useSelector((state) => state.authReducer);
+  const cartReducer = useSelector((state) => state.cartReducer)
+
+  //Dispatch
+  const dispatch = useDispatch();
 
   const [cartRaw, setCartRaw] = useState([]);
 
@@ -22,10 +26,12 @@ function Cart() {
   });
 
   const renderCartItem = () => {
-    console.log(cartItems);
+    console.log(`cartItems`, cartItems);
+    console.log(`cartReducer`, cartReducer)
+    console.log(``)
 
     return cartItems.map((val) => {
-      return <CartItem cartItem={val} />;
+      return <CartItem cartItem={val}/>;
     });
   };
 
@@ -33,7 +39,46 @@ function Cart() {
     const now = new Date();
     let transaction_date = date.format(now, "YYYY/MM/DD HH:mm:ss");
 
-    const income = 5000;
+    //Get income:
+
+    let income = 0;
+    let parcels = [];
+
+    cartRaw.forEach((cartItem) => {
+      const indexFind = parcels.findIndex(
+        (el) => el.id_parcel === cartItem.id_parcel
+      );
+
+      if (indexFind === -1) {
+        parcels.push({
+          id_parcel: cartItem.id_parcel,
+          parcel_price: cartItem.parcel_price,
+          products: [
+            {
+              id_product: cartItem.id_product,
+              product_price: cartItem.product_price,
+              product_quantity: cartItem.product_quantity,
+            },
+          ],
+        });
+      } else {
+        parcels[indexFind].products.push({
+          id_product: cartItem.id_product,
+          product_price: cartItem.product_price,
+          product_quantity: cartItem.product_quantity,
+        });
+      }
+    });
+
+    parcels.forEach((val) => {
+      let productsTotalPrice = 0;
+
+      val.products.forEach((product) => {
+        productsTotalPrice += product.product_price * product.product_quantity;
+      });
+
+      income += val.parcel_price - productsTotalPrice;
+    });
 
     Axios.post(`${API_URL}/cart/checkout`, {
       id_user: cartItems[0].id_user,
@@ -45,6 +90,10 @@ function Cart() {
       if (res.data.message) {
         alert(res.data.message);
 
+        dispatch({
+          type: "RESET_CART"
+        });
+
         const emptyAr = [];
         setCartRaw([...emptyAr]);
         setCartItems([...emptyAr]);
@@ -53,6 +102,7 @@ function Cart() {
   };
 
   useEffect(() => {
+    console.log(`cartReducer`, cartReducer)
     Axios.post(`${API_URL}/cart/get`, {
       id_user: authReducer.id_user,
     }).then((res) => {
@@ -64,13 +114,14 @@ function Cart() {
         let index = cartArray.findIndex((el) => el.id_cart === rawObj.id_cart);
 
         if (index === -1) {
-          const { id_cart, id_user, parcel_name, parcel_price, image_parcel } =
+          const {id_parcel, id_cart, id_user, parcel_name, parcel_price, image_parcel } =
             rawObj;
 
           let products = {};
           products[rawObj.product_name] = rawObj.product_quantity;
 
           cartArray.push({
+            id_parcel,
             id_cart,
             id_user,
             parcel_name,
