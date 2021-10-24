@@ -46,7 +46,7 @@ function Navigation() {
           id="basic-nav-dropdown"
         >
           <NavDropdown.Item href="#action/3.2">
-            <Link to="/" style={{ color: "inherit", textDecoration: "none" }}>
+            <Link to="/user/transactions" style={{ color: "inherit", textDecoration: "none" }}>
               Transactions
             </Link>
           </NavDropdown.Item>
