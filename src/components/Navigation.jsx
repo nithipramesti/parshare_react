@@ -3,31 +3,37 @@ import logo from "../assets/images/Logo.png";
 import logoWhite from "../assets/images/Logo-white.png";
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
 
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutAction } from "../redux/actions/user";
 
 function Navigation() {
   //Get global state data
   const authReducer = useSelector((state) => state.authReducer);
+  const cartReducer = useSelector((state) => state.cartReducer);
 
   //Get dispatch
   const dispatch = useDispatch();
 
   //Log out user
   const onBtnLogout = () => {
-    logoutAction(dispatch);
+    logoutAction(dispatch, history);
   };
+
+  const history = useHistory();
 
   //Function to render nav links for logged USER
   const renderNavUser = () => {
     return (
       <Nav className="justify-content-end">
-        <Link to="/login" className="nav-link">
+        <Link to="/user/cart" className="nav-link">
           <i className="bi bi-cart3 icon-cart">
-            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-              9<span className="visually-hidden">cart items</span>
-            </span>
+            {cartReducer.cart_qty !== 0 && (
+              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {cartReducer.cart_qty}
+                <span className="visually-hidden">cart items</span>
+              </span>
+            )}
           </i>
         </Link>
         <NavDropdown
@@ -40,12 +46,15 @@ function Navigation() {
           id="basic-nav-dropdown"
         >
           <NavDropdown.Item href="#action/3.2">
-            <Link to="/" style={{ color: "inherit", textDecoration: "none" }}>
+            <Link to="/user/transactions" style={{ color: "inherit", textDecoration: "none" }}>
               Transactions
             </Link>
           </NavDropdown.Item>
           <NavDropdown.Item>
-            <Link to="/" style={{ color: "inherit", textDecoration: "none" }}>
+            <Link
+              to="/profile"
+              style={{ color: "inherit", textDecoration: "none" }}
+            >
               Account Setting
             </Link>
           </NavDropdown.Item>
@@ -69,21 +78,48 @@ function Navigation() {
   const renderNavAdmin = () => {
     return (
       <Nav className="justify-content-end">
-        <Link to="/admin/parcels" className="nav-link">
-          Parcels
-        </Link>
-        <Link to="/admin/products" className="nav-link">
-          Products
-        </Link>
-        <Link to="/" className="nav-link">
-          Transactions
-        </Link>
-        <Link to="/admin/stats" className="nav-link">
-          Stats
-        </Link>
-        <Link to="/" className="nav-link">
-          Log Out
-        </Link>
+        <NavDropdown
+          title={
+            <>
+              <i className="bi bi-person-circle icon-account"></i>
+              <span>Admin</span>
+            </>
+          }
+          id="basic-nav-dropdown"
+        >
+          <NavDropdown.Item href="#action/3.2">
+            <Link
+              to="/admin/parcels"
+              style={{ color: "inherit", textDecoration: "none" }}
+            >
+              Parcels
+            </Link>
+          </NavDropdown.Item>
+          <NavDropdown.Item>
+            <Link
+              to="/admin/products"
+              style={{ color: "inherit", textDecoration: "none" }}
+            >
+              Products
+            </Link>
+          </NavDropdown.Item>
+          <NavDropdown.Item>
+            <Link
+              to="/admin/transactions"
+              style={{ color: "inherit", textDecoration: "none" }}
+            >
+              Transactions
+            </Link>
+          </NavDropdown.Item>
+          <NavDropdown.Item>
+            <Link to="/admin/stats" style={{ color: "inherit", textDecoration: "none" }}>
+              Stats
+            </Link>
+          </NavDropdown.Item>
+
+          <NavDropdown.Divider />
+          <NavDropdown.Item onClick={onBtnLogout}>Log Out</NavDropdown.Item>
+        </NavDropdown>
       </Nav>
     );
   };

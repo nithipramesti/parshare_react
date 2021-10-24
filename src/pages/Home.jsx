@@ -29,7 +29,8 @@ function Home() {
 
           if (rawObject.active === "true") {
             //destructure rawObject to get parcel data (without categories)
-            let { id_parcel, parcel_name, image_parcel, active } = rawObject;
+            let { id_parcel, parcel_name, parcel_price, image_parcel, active } =
+              rawObject;
 
             let idParcelNotFound = true; //'false' if id_parcel found, will stay 'true' if id_parcel not found
 
@@ -48,6 +49,7 @@ function Home() {
               parcels.push({
                 id_parcel,
                 parcel_name,
+                parcel_price,
                 image_parcel,
                 active,
                 categories: [rawObject.category],
