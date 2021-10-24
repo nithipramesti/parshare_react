@@ -5,7 +5,8 @@ import Axios from 'axios';
 import { API_URL } from '../../data/API';
 import { Modal, Alert } from 'react-bootstrap';
 import { GridOverlay, DataGrid } from '@mui/x-data-grid';
-import { LinearProgress } from '@mui/material'
+import { LinearProgress } from '@mui/material';
+import image from '../../assets/images/default-product.png';
 
 function Products(){
   const authReducer = useSelector((state) => state.authReducer);
@@ -674,36 +675,45 @@ function Products(){
                 </Alert>
               : null
             }
-            <div className="container" style={
-              inputImage.image ?
-                {display: 'block'}
-              : {display: 'none'}
-            }>
-              <img id="preview" width="150px"></img>
+            <div className="row">
+              <div className="col-md-2">
+                <img id="preview" style={
+                  inputImage.image ?
+                    {display: 'inline-block', height: "140px", width: "140px"}
+                  : {display: 'none'}
+                }></img>
+                <img src={image} style={
+                  !inputImage.image ?
+                    {display: 'inline-block', height: "140px", width: "140px"}
+                  : {display: 'none'}
+                }></img>
+              </div>
+              <div className="col-md-10">
+                <label htmlFor="form-email" className="form-label">
+                  Image
+                </label>
+                <input
+                  type="file"
+                  className="form-control"
+                  placeholder="Image"
+                  name="image"
+                  onChange={inputImageHandler}
+                  required
+                />
+                <label htmlFor="form-email" className="form-label">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Product Name"
+                  name="name"
+                  onChange={inputProductHandler}
+                  value={inputProduct.name}
+                  required
+                />
+              </div>
             </div>
-            <label htmlFor="form-email" className="form-label">
-              Image
-            </label>
-            <input
-              type="file"
-              className="form-control"
-              placeholder="Image"
-              name="image"
-              onChange={inputImageHandler}
-              required
-            />
-            <label htmlFor="form-email" className="form-label">
-              Name
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Product Name"
-              name="name"
-              onChange={inputProductHandler}
-              value={inputProduct.name}
-              required
-            />
             <label htmlFor="form-email" className="form-label">
               Category
             </label>
@@ -761,36 +771,44 @@ function Products(){
                 </Alert>
               : null
             }
-            <div className="container">
-              <img src={`${API_URL}/${editProduct.image}`} width="150px" style={{display: "inline-block"}}></img>
-              <img id="edit_preview" width="150px" style={
-              editImage.image ?
-                {display: 'inline-block'}
-              : {display: 'none'}
-              }></img>
+            <div className="row">
+              <div className="col-md-2">
+                <img src={`${API_URL}/${editProduct.image}`} style={
+                  editImage.image ?
+                  {display: 'none'}
+                  : {display: 'inline-block', height: "140px", width: "140px"}
+                  }></img>
+                <img id="edit_preview" style={
+                editImage.image ?
+                  {display: 'inline-block', height: "140px", width: "140px"}
+                : {display: 'none'}
+                }></img>
+              </div>
+              <div className="col-md-10">
+                <label htmlFor="form-email" className="form-label">
+                  Image
+                </label>
+                <input
+                  type="file"
+                  className="form-control"
+                  placeholder="Image"
+                  name="image"
+                  onChange={editImageHandler}
+                />
+                <label htmlFor="form-email" className="form-label">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Product Name"
+                  name="name"
+                  onChange={editProductHandler}
+                  value={editProduct.name}
+                  required
+                />
+              </div>
             </div>
-            <label htmlFor="form-email" className="form-label">
-              Image
-            </label>
-            <input
-              type="file"
-              className="form-control"
-              placeholder="Image"
-              name="image"
-              onChange={editImageHandler}
-            />
-            <label htmlFor="form-email" className="form-label">
-              Name
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Product Name"
-              name="name"
-              onChange={editProductHandler}
-              value={editProduct.name}
-              required
-            />
             <label htmlFor="form-email" className="form-label">
               Category
             </label>
