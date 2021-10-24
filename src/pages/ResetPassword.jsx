@@ -18,6 +18,7 @@ function ResetPassword(props) {
   //State to indicate wether form is submitting or not
   let [isSubmitting, setIsSubmitting] = useState(false);
   let [isSubmitted, setIsSubmitted] = useState(false);
+  let [submitLoading, setSubmitLoading] = useState(false);
 
   //State to handling success/error message from backend
   let [resMessage, setResMessage] = useState({ success: "", error: "" });
@@ -44,8 +45,11 @@ function ResetPassword(props) {
     //new password validation
     if (!values.newPassword) {
       errors.newPassword = "Please insert your new password";
-    } else if (values.newPassword.length < 6) {
-      errors.newPassword = "Password needs to be 6 characters or more";
+    } else if (
+      !values.newPassword.match("(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}")
+    ) {
+      errors.newPassword =
+        "Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters";
     } else {
       delete errors.newPassword;
     }
@@ -73,12 +77,16 @@ function ResetPassword(props) {
   //Function
   useEffect(() => {
     if (Object.keys(errors).length === 0 && isSubmitting) {
+      setSubmitLoading(true);
+
       //Send request to backend
       Axios.patch(`${API_URL}/change-password/reset-password`, {
         userData: userData,
         newPassword: inputValues.newPassword,
       })
         .then((res) => {
+          setSubmitLoading(false);
+
           if (res.data.errMessage) {
             setResMessage({ ...resMessage, error: res.data.errMessage });
           } else {
@@ -187,6 +195,17 @@ function ResetPassword(props) {
           </>
         ) : (
           <>
+            {submitLoading && (
+              <div
+                className="alert alert-secondary mt-3 d-flex justify-content-center pt-3 pb-1"
+                role="alert"
+              >
+                <div className="spinner-border me-1" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+                <p>Submitting...</p>
+              </div>
+            )}
             <h2 className="fw-bold">Reset Password Success</h2>
             <Link to="/login">Click here to login</Link>
           </>
