@@ -64,7 +64,9 @@ function Login() {
   if (authReducer.role === "user") {
     //if role is 'user', redirect to home page
     return <Redirect to="/" />;
-  } else {
+  } else if (authReducer.role === "admin") {
+    return <Redirect to="/admin/products" />;
+  }else {
     return (
       <div className="login container-fluid">
         <div className="row">

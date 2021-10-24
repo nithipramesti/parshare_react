@@ -78,7 +78,7 @@ function Navigation() {
         <Link to="/" className="nav-link">
           Transactions
         </Link>
-        <Link to="/" className="nav-link">
+        <Link to="/admin/stats" className="nav-link">
           Stats
         </Link>
         <Link to="/" className="nav-link">

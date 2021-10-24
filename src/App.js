@@ -20,6 +20,7 @@ import ResetPassword from "./pages/ResetPassword";
 import ChangePassword from "./pages/ChangePassword";
 import Products from './pages/admin/Products';
 import Parcels from './pages/admin/Parcels';
+import Stats from './pages/admin/Stats';
 
 function App() {
   //Get global state data
@@ -56,6 +57,7 @@ function App() {
           <Route component={ChangePassword} path="/change-password/" />
           <Route component={Home} path="/" exact />
           <Route component={Products} path="/admin/products" />
+          <Route component={Stats} path="/admin/stats" />
           <Route component={Parcels} path="/admin/parcels" />
         </Switch>
       </BrowserRouter>

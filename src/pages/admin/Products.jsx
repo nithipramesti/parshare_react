@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Redirect } from 'react-router-dom';
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import Axios from 'axios';
 import { API_URL } from '../../data/API';
 import { Modal, Alert } from 'react-bootstrap';
-import { DataGrid } from '@mui/x-data-grid';
+import { GridOverlay, DataGrid } from '@mui/x-data-grid';
+import { LinearProgress } from '@mui/material'
 
 function Products(){
   const authReducer = useSelector((state) => state.authReducer);
@@ -369,6 +370,15 @@ function Products(){
     setShowEditCategoryModal(false)
   }
 
+  const CustomLoadingOverlay = () => {
+    return (
+      <GridOverlay>
+        <div style={{ position: 'absolute', top: 0, width: '100%' }}>
+          <LinearProgress />
+        </div>
+      </GridOverlay>
+    )
+  }
   const handleShowEditProductModal = (id) => {
     setShowAlert({
       show: false
@@ -485,9 +495,18 @@ function Products(){
       }
     ];
 
+    let loading = true;
+    if(productList.length > 0) {
+      loading = false;
+    }
+
     return <DataGrid
       rows={productList} 
-      columns={columns} 
+      columns={columns}
+      components={{
+        LoadingOverlay: CustomLoadingOverlay,
+      }}
+      loading={loading}
       autoHeight
       hideFooterSelectedRowCount
       style={{marginTop: "15px"}}
