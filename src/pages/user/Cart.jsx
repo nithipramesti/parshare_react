@@ -39,7 +39,46 @@ function Cart() {
     const now = new Date();
     let transaction_date = date.format(now, "YYYY/MM/DD HH:mm:ss");
 
-    const income = 5000;
+    //Get income:
+
+    let income = 0;
+    let parcels = [];
+
+    cartRaw.forEach((cartItem) => {
+      const indexFind = parcels.findIndex(
+        (el) => el.id_parcel === cartItem.id_parcel
+      );
+
+      if (indexFind === -1) {
+        parcels.push({
+          id_parcel: cartItem.id_parcel,
+          parcel_price: cartItem.parcel_price,
+          products: [
+            {
+              id_product: cartItem.id_product,
+              product_price: cartItem.product_price,
+              product_quantity: cartItem.product_quantity,
+            },
+          ],
+        });
+      } else {
+        parcels[indexFind].products.push({
+          id_product: cartItem.id_product,
+          product_price: cartItem.product_price,
+          product_quantity: cartItem.product_quantity,
+        });
+      }
+    });
+
+    parcels.forEach((val) => {
+      let productsTotalPrice = 0;
+
+      val.products.forEach((product) => {
+        productsTotalPrice += product.product_price * product.product_quantity;
+      });
+
+      income += val.parcel_price - productsTotalPrice;
+    });
 
     Axios.post(`${API_URL}/cart/checkout`, {
       id_user: cartItems[0].id_user,
