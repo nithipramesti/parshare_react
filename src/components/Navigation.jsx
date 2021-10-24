@@ -112,7 +112,7 @@ function Navigation() {
             </Link>
           </NavDropdown.Item>
           <NavDropdown.Item>
-            <Link to="/" style={{ color: "inherit", textDecoration: "none" }}>
+            <Link to="/admin/stats" style={{ color: "inherit", textDecoration: "none" }}>
               Stats
             </Link>
           </NavDropdown.Item>

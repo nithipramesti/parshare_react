@@ -17,8 +17,9 @@ import Navigation from "./components/Navigation";
 import VerificationPage from "./pages/VerificationPage";
 import ResetPassword from "./pages/ResetPassword";
 import ChangePassword from "./pages/ChangePassword";
-import Products from "./pages/admin/Products";
-import Parcels from "./pages/admin/Parcels";
+import Products from './pages/admin/Products';
+import Parcels from './pages/admin/Parcels';
+import Stats from './pages/admin/Stats';
 import Transactions from "./pages/user/Transactions";
 import Profile from "./pages/Profile";
 import ParcelDetails from "./pages/user/ParcelDetails";
@@ -63,6 +64,7 @@ function App() {
           <Route component={ParcelDetails} path="/parcel/:id_parcel" />
           <Route component={ParcelDetails} path="/parcel/:id_parcel/:id_cart" />
           <Route component={Products} path="/admin/products" />
+          <Route component={Stats} path="/admin/stats" />
           <Route component={Parcels} path="/admin/parcels" />
           <Route component={Cart} path="/user/cart" />
           <Route component={Transactions} path="/user/transactions" />
