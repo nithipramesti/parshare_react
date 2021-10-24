@@ -248,7 +248,7 @@ function Parcels(){
         setShowAlert({
           show: true,
           type: "success",
-          message: "Add parcel succeed"
+          message: "Edit parcel succeed"
         })
       })
       .catch(err => {
@@ -349,6 +349,7 @@ function Parcels(){
   };
 
   const renderGrid = () => {
+    console.log(`parcelList`,parcelList)
     const columns = [
       {
         field: 'id',
