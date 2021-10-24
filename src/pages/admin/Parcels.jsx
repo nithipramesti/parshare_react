@@ -130,7 +130,12 @@ function Parcels(){
     console.log(`avgPriceProductCategory length : `,avgPriceProductCategory.length)
     for(let i=0;i<selectCategory.length;i++){
       console.log(`perulangan i ke ${i}`)
-      let id_category_selected = parseInt(selectCategory[i].category)
+      if(selectCategory[i].category===""){
+        selectCategory[i].category = 1
+      }else{
+        selectCategory[i].category = parseInt(selectCategory[i].category)
+      }
+      let id_category_selected = selectCategory[i].category
       let category_quantity_selected = parseInt(selectCategory[i].quantity)
       console.log(`id_category_selected : `,id_category_selected)
       for(let j=0;j<avgPriceProductCategory.length;j++){
@@ -157,7 +162,12 @@ function Parcels(){
     console.log(`avgPriceProductCategory length : `,avgPriceProductCategory.length)
     for(let i=0;i<selectCategory.length;i++){
       console.log(`perulangan i ke ${i}`)
-      let id_category_selected = parseInt(selectCategory[i].category)
+      if(selectCategory[i].category===""){
+        selectCategory[i].category = 1
+      }else{
+        selectCategory[i].category = parseInt(selectCategory[i].category)
+      }
+      let id_category_selected = selectCategory[i].category
       let category_quantity_selected = parseInt(selectCategory[i].quantity)
       console.log(`id_category_selected : `,id_category_selected)
       for(let j=0;j<avgPriceProductCategory.length;j++){
@@ -558,7 +568,8 @@ function Parcels(){
                             return(
                                 category.id_category === parseInt(res.category) ?
                                 <option value={category.id_category} selected>{category.category}</option>
-                              : <option value={category.id_category}>{category.category}</option>
+                              : 
+                              <option value={category.id_category}>{category.category}</option>
                             )
                           })
                         }
