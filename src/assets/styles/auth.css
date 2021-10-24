@@ -16,7 +16,8 @@
   background-color: #fff;
 }
 
-.container-login {
+.container-login,
+.container-register {
   width: 450px;
 }
 
@@ -27,6 +28,25 @@ form,
 
 .form-email:invalid {
   outline: red;
+}
+
+.password-input-container {
+  position: relative;
+}
+
+svg.eye-icon {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+}
+
+.input-invalid {
+  border-color: red;
+}
+
+.validation-alert {
+  margin-top: 7px;
+  font-size: 13px;
 }
 
 /* BOOTSTRAP COMPONENTS */
