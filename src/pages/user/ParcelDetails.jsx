@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import AddedProductCard from "../../components/AddedProductCard";
+import { Link } from "react-router-dom";
 
 function ParcelDetails(props) {
   //Get id_parcel from route params
@@ -16,7 +17,6 @@ function ParcelDetails(props) {
   //Global state
   const authReducer = useSelector((state) => state.authReducer);
   const cartReducer = useSelector((state) => state.cartReducer);
-
 
   //State for loading
   const [isLoading, setIsLoading] = useState(true);
@@ -30,11 +30,21 @@ function ParcelDetails(props) {
   //State for saving products data
   const [products, setProducts] = useState([]);
 
+  //State for pagination
+  const [pagination, setPagination] = useState({
+    page: 1,
+    maxPage: 0,
+    itemPerPage: 9,
+  });
+
   //State for saving filtered products data
   const [filteredProducts, setFilteredProducts] = useState([]);
 
   //State for saving category filter
   const [filterCategory, setFilterCategory] = useState("All");
+
+  //State for sorting
+  const [sortBy, setSortBy] = useState("");
 
   //State for saving added products & quantity
   const [addedProducts, setAddedProducts] = useState(cartReducer.products);
@@ -44,6 +54,19 @@ function ParcelDetails(props) {
     displayed: false,
     product: {},
   });
+
+  //Function for pagination
+  const paginationHandler = (direction) => {
+    if (direction === "next") {
+      if (pagination.page < pagination.maxPage) {
+        setPagination({ ...pagination, page: pagination.page + 1 });
+      }
+    } else if (direction === "previous") {
+      if (pagination.page > 0) {
+        setPagination({ ...pagination, page: pagination.page - 1 });
+      }
+    }
+  };
 
   //Render categories & quantity
   const renderCategories = () => {
@@ -205,23 +228,23 @@ function ParcelDetails(props) {
     }
 
     if (authReducer.username) {
-      console.log(`addedProducts: `,addedProducts)
+      console.log(`addedProducts: `, addedProducts);
       if (cartReady) {
         Axios.post(`${API_URL}/cart/add`, {
           id_user: authReducer.id_user,
           id_parcel: id_parcel,
           products: addedProducts,
         }).then((res) => {
-          console.log(`id_cart:`,res.data.data)
+          console.log(`id_cart:`, res.data.data);
           alert("Parcel added to cart!");
           // Set global state
           dispatch({
             type: "ADD_CART",
-            payload : {
-              id_parcel : id_parcel,
-              id_cart : res.data.data,
-              products : addedProducts
-            }
+            payload: {
+              id_parcel: id_parcel,
+              id_cart: res.data.data,
+              products: addedProducts,
+            },
           });
         });
       } else {
@@ -233,22 +256,22 @@ function ParcelDetails(props) {
   };
 
   const editToCart = () => {
-    console.log(`parcelData`, parcelData)
-    console.log(`selectedCategories`, selectedCategories)
+    console.log(`parcelData`, parcelData);
+    console.log(`selectedCategories`, selectedCategories);
 
     //Get array of categories
     const categories = Object.keys(parcelData.categories);
 
-    console.log(`selectedCategories2`, selectedCategories)
+    console.log(`selectedCategories2`, selectedCategories);
 
     let cartReady = true;
 
     if (authReducer.username) {
-      console.log(`addedProducts: `,addedProducts)
+      console.log(`addedProducts: `, addedProducts);
       if (cartReady) {
         Axios.patch(`${API_URL}/cart/edit`, {
           id_user: authReducer.id_user,
-          id_cart : cartReducer.id_cart,
+          id_cart: cartReducer.id_cart,
           id_parcel: id_parcel,
           products: addedProducts,
         }).then((res) => {
@@ -331,20 +354,6 @@ function ParcelDetails(props) {
     setFilteredProducts([...arr]);
   }, [filterCategory]);
 
-  //Render product cards
-  const renderProductCards = () => {
-    return filteredProducts.map((product, index) => {
-      return (
-        <ProductCard
-          productData={product}
-          addProduct={addProduct}
-          index={index}
-          displayModal={displayModal}
-        />
-      );
-    });
-  };
-
   //Render categories filter
   const renderCategoriesFilter = () => {
     let categoriesFilter = ["All", ...Object.keys(parcelData.categories)];
@@ -369,13 +378,59 @@ function ParcelDetails(props) {
     setFilteredProducts([...searchResult]);
   };
 
+  //Render product cards
+  const renderProductCards = () => {
+    const beginningIndex = (pagination.page - 1) * pagination.itemPerPage;
+    let rawData = [...filteredProducts];
+
+    const compareString = (a, b) => {
+      if (a.product_name < b.product_name) {
+        return -1;
+      } else if (a.product_name > b.product_name) {
+        return 1;
+      } else {
+        return 0;
+      }
+    };
+
+    switch (sortBy) {
+      case "az":
+        rawData.sort(compareString);
+        break;
+
+      case "za":
+        rawData.sort((a, b) => compareString(b, a));
+        break;
+
+      default:
+        rawData = [...filteredProducts];
+        break;
+    }
+
+    const currentData = rawData.slice(
+      beginningIndex,
+      beginningIndex + pagination.itemPerPage
+    );
+
+    return currentData.map((product, index) => {
+      return (
+        <ProductCard
+          productData={product}
+          addProduct={addProduct}
+          index={index}
+          displayModal={displayModal}
+        />
+      );
+    });
+  };
+
   //Render added product cards
   const renderAddedProductCards = () => {
-    console.log(`addedProduct : `,addedProducts)
-    console.log(`cartReducer: `, cartReducer)
+    console.log(`addedProduct : `, addedProducts);
+    console.log(`cartReducer: `, cartReducer);
     return addedProducts.map((product, index) => {
       if (product.selected > 0) {
-        console.log(`product:`,product)
+        console.log(`product:`, product);
         return (
           <AddedProductCard
             productData={product}
@@ -388,7 +443,7 @@ function ParcelDetails(props) {
     });
   };
 
-  //Get product data
+  //Fetching product data
   useEffect(() => {
     //Send request to backend
     Axios.get(`${API_URL}/products/get/${id_parcel}`)
@@ -403,8 +458,16 @@ function ParcelDetails(props) {
           //Save products data to state
           setProducts(res.data.products);
 
-          //Save products data to state
+          //Save products data to filter state
           setFilteredProducts(res.data.products);
+
+          //Set max page -- depends on products number
+          const maxPage = Math.ceil(
+            res.data.products.length / pagination.itemPerPage
+          );
+          setPagination({ ...pagination, maxPage });
+
+          console.log("max page: ", maxPage);
 
           setIsLoading(false);
         } else {
@@ -426,19 +489,50 @@ function ParcelDetails(props) {
     return (
       <div className="parcel-detail">
         <div className="mx-5 main">
+          <nav className="breadcrumb-container" aria-label="breadcrumb">
+            <ol className="breadcrumb">
+              <li className="breadcrumb-item">
+                <Link to="/">Parcels</Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">
+                {parcelData.name}
+              </li>
+            </ol>
+          </nav>
           <div className="row">
-            <div className="parcel-info mb-2">
+            <div className="parcel-info mb-3">
               {parcelData.name && <h1 className="mb-1">{parcelData.name}</h1>}
-              <p className="mb-2 text-muted">
-                {parcelData.categories && renderCategories()}
-              </p>
-              <p className="">
-                {parcelData.price && (
-                  <strong className="mb-1">
-                    Rp {parcelData.price.toLocaleString()}
-                  </strong>
-                )}
-              </p>
+              <div className="sub-info">
+                <p className="categories mb-2 text-muted">
+                  {parcelData.categories && renderCategories()}
+                </p>
+                <div className="d-flex justify-content-between">
+                  <p className="mb-0">
+                    {parcelData.price && (
+                      <strong>Rp {parcelData.price.toLocaleString()}</strong>
+                    )}
+                  </p>
+                  <div className="search-filter d-flex align-items-center">
+                    <input
+                      type="email"
+                      className="form-control pe-4"
+                      name="searchInput"
+                      onChange={searchInputHandler}
+                      placeholder="Search product"
+                    />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      fill="currentColor"
+                      className="bi bi-search search-icon"
+                      viewBox="0 0 16 16"
+                    >
+                      <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="col-4 card p-0">
@@ -461,32 +555,62 @@ function ParcelDetails(props) {
               </div>
             </div>
             <div className="col-8">
-              <div className="filter d-flex justify-content-between">
+              <div className="filter-sort mb-3 d-flex justify-content-between">
                 <div className="d-flex">{renderCategoriesFilter()}</div>
-                {/* <select
-                className="form-select"
-                aria-label="Default select example"
-                onChange={(e) => setFilterCategory(e.target.value)}
-              >
-                <option value="" selected>
-                  All Categories
-                </option>
-                <option value="Chocolate">Chocolate</option>
-                <option value="Snack">Snack</option>
-              </select> */}
-                <div className="search-filter d-flex mb-3">
-                  <input
-                    type="email"
-                    className="form-control"
-                    name="searchInput"
-                    onChange={searchInputHandler}
-                    placeholder="Search product"
-                  />
+                <div className="sort-container d-flex align-items-center">
+                  <span className="sort-title me-1">Sort by:</span>
+                  <select
+                    className="form-select"
+                    aria-label="Default select example"
+                    onChange={(e) => setSortBy(e.target.value)}
+                  >
+                    <option value="" selected>
+                      None
+                    </option>
+                    <option value="az">A - Z</option>
+                    <option value="za">Z - A</option>
+                  </select>
                 </div>
               </div>
               <div className="products-container">{renderProductCards()}</div>
             </div>
           </div>
+          <nav
+            className="pagination-container mt-4 ps-0 me-5 pe-5"
+            aria-label="Page navigation example"
+          >
+            <ul className="pagination justify-content-end">
+              <li
+                className={`page-item ${
+                  pagination.page === 1 ? `disabled` : ``
+                }`}
+              >
+                <button
+                  onClick={() => paginationHandler("previous")}
+                  className="page-link"
+                  aria-label="Previous"
+                >
+                  <span aria-hidden="true">&laquo;</span>
+                </button>
+              </li>
+              <li className="page-item disabled" aria-current="page">
+                <button className="page-link">{`${pagination.page} / ${pagination.maxPage}`}</button>
+              </li>
+              <li
+                className={`page-item ${
+                  pagination.page === pagination.maxPage ? `disabled` : ``
+                }`}
+              >
+                <button
+                  onClick={() => paginationHandler("next")}
+                  className="page-link"
+                  aria-label="Next"
+                >
+                  <span aria-hidden="true">&raquo;</span>
+                </button>
+              </li>
+            </ul>
+          </nav>
         </div>
         {renderProductDetails()}
       </div>
