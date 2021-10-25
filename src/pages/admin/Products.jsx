@@ -25,6 +25,7 @@ function Products(){
   const [ showEditProductModal, setShowEditProductModal ] = useState(false);
   const [ editProduct, setEditProduct ] = useState({});
   const [ editImage, setEditImage ] = useState({});
+  const [ selectCategory, setSelectCategory ] = useState(0);
 
   const fetchCategory = () => {
     Axios.get(`${API_URL}/categories/list`)
@@ -43,8 +44,8 @@ function Products(){
     })
   }
 
-  const fetchProduct = () => {
-    Axios.get(`${API_URL}/products/list`)
+  const fetchProduct = (id) => {
+    Axios.get(`${API_URL}/products/list?id=${id}`)
     .then(res => {
       setProductList( res.data.data )
     })
@@ -55,7 +56,7 @@ function Products(){
 
   useEffect(() => {
     fetchCategory();
-    fetchProduct();
+    fetchProduct("all");
   }, []);
 
   const inputProductHandler = (e) => {
@@ -71,7 +72,7 @@ function Products(){
     }
   }
   const addProductHandler = () => {
-    if(inputImage.image && inputProduct.name && inputProduct.price && inputProduct.category && inputProduct.quantity){
+    if(inputImage.image && inputProduct.name && inputProduct.price && inputProduct.category && inputProduct.quantity && inputProduct.description) {
       let formData = new FormData();
       let obj = {
         ...inputProduct
@@ -85,7 +86,7 @@ function Products(){
         }
       })
       .then(res => {
-        fetchProduct();
+        fetchProduct("all");
         setShowAlert({
           show: true,
           type: "success",
@@ -138,7 +139,7 @@ function Products(){
       })
       .then(res => {
         setEditImage({});
-        fetchProduct();
+        fetchProduct("all");
         setShowAlert({
           show: true,
           type: "success",
@@ -169,7 +170,7 @@ function Products(){
         }
       })
       .then(res => {
-        fetchProduct();
+        fetchProduct("all");
         setShowAlert({
           show: true,
           type: "success",
@@ -202,7 +203,7 @@ function Products(){
         }
       })
       .then(res => {
-        fetchProduct()
+        fetchProduct("all")
         setShowAlert({
           show: true,
           type: "success",
@@ -275,7 +276,7 @@ function Products(){
       })
       .then(res => {
         fetchCategory()
-        fetchProduct()
+        fetchProduct("all")
         setShowAlert({
           show: true,
           type: "success",
@@ -334,6 +335,15 @@ function Products(){
     }
   }
 
+  const selectCategoryHandler = (id) => {
+    setProductList([])
+    console.log("CLICK"+id)
+    setSelectCategory(id)
+    if(id === 0){
+      id = "all"
+    }
+    fetchProduct(id)
+  }
   const handleCloseProductModal = () => {
     setInputImage({})
     setShowAlert({
@@ -342,6 +352,7 @@ function Products(){
     setShowProductModal(false)
   };
   const handleShowProductModal = () => {
+    setInputProduct({})
     setShowProductModal(true)
   };
 
@@ -358,8 +369,7 @@ function Products(){
   const handleShowEditCategoryModal = (id, name, total) => {
     setEditCategory({
       id,
-      name,
-      total
+      name
     })
     setShowEditCategoryModal(true)
   }
@@ -546,7 +556,11 @@ function Products(){
         </div>
 
         <div style={{overFlowY: 'auto', minWidth: '100%'}}>
-          <div className="border border-secondary" style={{display: 'inline-block', padding: "2px 10px 2px 10px", minWidth: "60px", marginRight: "7px", borderRadius: "20px", marginBottom: "2px", textAlign: "center"}}>
+          <div className="border border-secondary" onClick={() => selectCategoryHandler(0)} style={
+            selectCategory === 0 ?
+              {cursor: "pointer", background: "#041E43", color: "#fff", display: 'inline-block', padding: "2px 10px 2px 10px", minWidth: "60px", marginRight: "7px", borderRadius: "20px", marginBottom: "2px", textAlign: "center"}
+            : {cursor: "pointer", background: "#fff", color: "#000", display: 'inline-block', padding: "2px 10px 2px 10px", minWidth: "60px", marginRight: "7px", borderRadius: "20px", marginBottom: "2px", textAlign: "center"}
+          }>
             All <span class="badge alert-primary">
               {
                 categoryListWithTotal.reduce((a, b) => {
@@ -557,23 +571,25 @@ function Products(){
           </div>
           {
             categoryList.map(category => {
-              if(category.active === "true"){
-                return (
-                  <div className="border border-secondary hover-display-parent" style={{display: 'inline-block', padding: "2px 10px 2px 10px", minWidth: "60px", marginRight: "7px", borderRadius: "20px", marginBottom: "2px", textAlign: "center"}}>
-                    {`${category.category} `}
-                    {
-                      categoryListWithTotal.map(total => 
-                        total.total > 0 && total.id_category === category.id_category ?
-                          <>
-                          <span class="badge alert-primary">{total.total}</span>
-                          <span onClick={() => handleShowEditCategoryModal(total.id_category, total.category, true)} className="hover-display hover-yellow badge badge-pill alert-warning" style={{fontSize: "11px", cursor: "pointer"}}>Edit</span>
-                          </>
-                        : null
-                      )
-                    }
-                  </div>
-                )
-              }
+              return ( 
+                <div className="border border-secondary hover-display-parent" onClick={() => selectCategoryHandler(category.id_category)} style={
+                  category.id_category === selectCategory ?
+                    {cursor: "pointer", background: "#041E43", color: "#fff", display: 'inline-block', padding: "2px 10px 2px 10px", minWidth: "60px", marginRight: "7px", borderRadius: "20px", marginBottom: "2px", textAlign: "center"}
+                  : {cursor: "pointer", background: "#fff", color: "#000", display: 'inline-block', padding: "2px 10px 2px 10px", minWidth: "60px", marginRight: "7px", borderRadius: "20px", marginBottom: "2px", textAlign: "center"}
+                  }>
+                  {`${category.category} `}
+                  {
+                    categoryListWithTotal.map(total => 
+                      total.total > 0 && total.id_category === category.id_category ?
+                        <>
+                        <span class="badge alert-primary">{total.total}</span>
+                        </>
+                      : null
+                    )
+                  }
+                  <span onClick={() => handleShowEditCategoryModal(category.id_category, category.category, true)} className="hover-display hover-yellow badge badge-pill alert-warning" style={{fontSize: "11px", cursor: "pointer"}}>Edit</span>
+                </div>
+              )
             })
           }
           <button onClick={handleShowCategoryModal} className="btn border border-secondary" style={{display: 'inline-block', padding: "2px 10px 2px 10px", minWidth: "60px", marginRight: "7px", borderRadius: "20px", marginBottom: "2px", textAlign: "center"}}>
@@ -601,7 +617,7 @@ function Products(){
             <input
               type="text"
               className="form-control"
-              placeholder="Product Name"
+              placeholder="Category Name"
               name="name"
               onChange={inputCategoryHandler}
               value={inputCategory.name}
@@ -636,7 +652,7 @@ function Products(){
             <input
               type="text"
               className="form-control"
-              placeholder="Product Name"
+              placeholder="Category Name"
               name="name"
               onChange={inputEditCategoryHandler}
               value={editCategory.name}
@@ -655,13 +671,10 @@ function Products(){
                   </>
                 :
                   <>
-                  <div className="col-md-4">
+                  <div className="col-md-6">
                     <button type="button" onClick={editCategoryHandler} className="btn btn-success w-100 mt-3">Edit</button>
                   </div>
-                  <div className="col-md-4">
-                    <button type="button" onClick={deleteCategoryHandler} className="btn btn-danger w-100 mt-3">Delete</button>
-                  </div>
-                  <div className="col-md-4">
+                  <div className="col-md-6">
                     <button onClick={handleCloseEditCategoryModal} className="btn btn-secondary w-100 mt-3">Close</button>
                   </div>
                   </>
