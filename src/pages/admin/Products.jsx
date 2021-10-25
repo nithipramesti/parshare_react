@@ -561,13 +561,7 @@ function Products(){
               {cursor: "pointer", background: "#041E43", color: "#fff", display: 'inline-block', padding: "2px 10px 2px 10px", minWidth: "60px", marginRight: "7px", borderRadius: "20px", marginBottom: "2px", textAlign: "center"}
             : {cursor: "pointer", background: "#fff", color: "#000", display: 'inline-block', padding: "2px 10px 2px 10px", minWidth: "60px", marginRight: "7px", borderRadius: "20px", marginBottom: "2px", textAlign: "center"}
           }>
-            All <span class="badge alert-primary">
-              {
-                categoryListWithTotal.reduce((a, b) => {
-                  return a + b.total
-                }, 0)
-              }
-            </span>
+            All
           </div>
           {
             categoryList.map(category => {
