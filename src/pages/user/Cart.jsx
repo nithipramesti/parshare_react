@@ -90,9 +90,9 @@ function Cart() {
       if (res.data.message) {
         alert(res.data.message);
 
-        dispatch({
-          type: "RESET_CART"
-        });
+        // dispatch({
+        //   type: "RESET_CART"
+        // });
 
         const emptyAr = [];
         setCartRaw([...emptyAr]);
