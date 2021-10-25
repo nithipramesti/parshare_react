@@ -61,8 +61,8 @@ function App() {
           <Route component={ForgotPassword} path="/forgot-password" />
           <Route component={ResetPassword} path="/reset-password/:token" />
           <Route component={ChangePassword} path="/change-password/" />
-          <Route component={ParcelDetails} path="/parcel/:id_parcel" />
           <Route component={ParcelDetails} path="/parcel/:id_parcel/:id_cart" />
+          <Route component={ParcelDetails} path="/parcel/:id_parcel" />
           <Route component={Products} path="/admin/products" />
           <Route component={Stats} path="/admin/stats" />
           <Route component={Parcels} path="/admin/parcels" />

@@ -123,7 +123,7 @@ function Products(){
     setEditProduct({ ...editProduct, [name]: value });
   }
   const submitEditProductHandler = () => {
-    if(editProduct.id && editProduct.name && editProduct.price && editProduct.category && editProduct.quantity && editProduct.image && editImage.image){
+    if(editProduct.id && editProduct.name && editProduct.price && editProduct.category && editProduct.description && editProduct.quantity && editProduct.image && editImage.image){
       let formData = new FormData();
       let obj = {
         ...editProduct
@@ -155,7 +155,7 @@ function Products(){
             message: err.response.data.data
           })
       });
-    }else if(editProduct.id && editProduct.name && editProduct.price && editProduct.category && editProduct.quantity && editProduct.image){
+    }else if(editProduct.id && editProduct.name && editProduct.price && editProduct.category && editProduct.description && editProduct.quantity && editProduct.image){
       let formData = new FormData();
       let obj = {
         ...editProduct
@@ -389,6 +389,7 @@ function Products(){
         setEditProduct({
           id: product.id_product,
           name: product.product_name,
+          description: product.description,
           price: product.product_price,
           image: product.image_product,
           category: product.id_category,
@@ -434,6 +435,12 @@ function Products(){
         headerName: 'Name',
         headerAlign: 'center',
         width: 200,
+      },
+      {
+        field: 'description',
+        headerName: 'Description',
+        headerAlign: 'center',
+        width: 400,
       }, 
       {
         field: 'product_price',
@@ -715,6 +722,10 @@ function Products(){
               </div>
             </div>
             <label htmlFor="form-email" className="form-label">
+              Description
+            </label>
+            <textarea className="form-control" name="description" onChange={inputProductHandler}></textarea>
+            <label htmlFor="form-email" className="form-label">
               Category
             </label>
             <select class="form-select" aria-label="Default select example" name="category" onChange={inputProductHandler}>
@@ -809,6 +820,10 @@ function Products(){
                 />
               </div>
             </div>
+            <label htmlFor="form-email" className="form-label">
+              Description
+            </label>
+            <textarea className="form-control" name="description" onChange={editProductHandler}>{editProduct.description}</textarea>
             <label htmlFor="form-email" className="form-label">
               Category
             </label>
