@@ -13,8 +13,17 @@ export const Transactions = () => {
   //State to save filter status
   const [filterStatus, setFilterStatus] = useState("Pending");
 
+  //State to save parcel list
+  const [parcelList, setParcelList] = useState([]);
+
+  //State for filtering by parcels
+  const [activeParcel, setActiveParcel] = useState("");
+
   //State to save filtered data
   const [filteredData, setFilteredData] = useState([]);
+
+  //State to save filtered data by PARCELS
+  const [currentData, setCurrentData] = useState(filteredData);
 
   //State for transaction details modal
   const [modalToggle, setModalToggle] = useState({
@@ -37,10 +46,62 @@ export const Transactions = () => {
     setFilteredData([...filtered]);
   }, [filterStatus]);
 
+  //Filter data by status
+  useEffect(() => {
+    console.log(filterStatus);
+
+    let filtered = transactionsData.filter((val) => {
+      if (filterStatus === "Pending") {
+        return val.status === filterStatus;
+      } else {
+        return val.status === "Confirmed" || val.status === "Rejected";
+      }
+    });
+
+    let rawData = [...filtered];
+
+    let filteredByParcel = rawData;
+
+    if (activeParcel) {
+      filteredByParcel = rawData.filter((val) => {
+        const indexFind = val.parcels.findIndex(
+          (el) => el.parcel_name === activeParcel
+        );
+        if (indexFind !== -1) {
+          return true;
+        }
+      });
+    }
+
+    setFilteredData([...filteredByParcel]);
+    setCurrentData([...filteredByParcel]);
+  }, [filterStatus]);
+
+  //Filter data by parcel
+  useEffect(() => {
+    let rawData = [...filteredData];
+
+    let filteredByParcel = rawData;
+
+    if (activeParcel) {
+      filteredByParcel = rawData.filter((val) => {
+        const indexFind = val.parcels.findIndex(
+          (el) => el.parcel_name === activeParcel
+        );
+        if (indexFind !== -1) {
+          return true;
+        }
+      });
+    }
+
+    setCurrentData([...filteredByParcel]);
+  }, [activeParcel]);
+
   //Render transaction cards
   const renderTransactionCards = () => {
-    console.log(filteredData); //empty every change filterStatus??!!
-    return filteredData.map((val, index) => {
+    console.log(currentData);
+
+    return currentData.map((val, index) => {
       return (
         <AdminTransactionsCard
           transactionsData={val}
@@ -55,7 +116,7 @@ export const Transactions = () => {
   const renderTransactionDetails = () => {
     return (
       <AdminTransactionsDetails
-        transactionData={filteredData[modalToggle.transactionIndex]}
+        transactionData={currentData[modalToggle.transactionIndex]}
         setModalToggle={setModalToggle}
         setTransactionsData={setTransactionsData}
         setFilteredData={setFilteredData}
@@ -63,11 +124,33 @@ export const Transactions = () => {
     );
   };
 
+  //Render parcel list filter
+  const renderParcelList = () => {
+    return parcelList.map((val) => {
+      return <option value={val.parcel_name}>{val.parcel_name}</option>;
+    });
+  };
+
   //Fetching transaction data
   useEffect(() => {
     //Get user token
     const userLocalStorage = localStorage.getItem("token_parshare");
 
+    //Get parcel list
+    Axios.post(
+      `${API_URL}/transactions/parcel-list`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${userLocalStorage}`,
+        },
+      }
+    ).then((res) => {
+      console.log(res.data.parcelList);
+      setParcelList(res.data.parcelList);
+    });
+
+    //Get transaction data
     Axios.post(
       `${API_URL}/transactions/get-all`,
       {},
@@ -85,6 +168,11 @@ export const Transactions = () => {
             (val) => val.status === filterStatus
           )
         );
+        setCurrentData(
+          [...res.data.transactionsData].filter(
+            (val) => val.status === filterStatus
+          )
+        );
       })
       .catch((err) => {
         console.log(err);
@@ -96,6 +184,16 @@ export const Transactions = () => {
   return (
     <div className="transactions-admin mb-5">
       <h1 className="mb-4">Transactions</h1>
+      <select
+        className="form-select parcel-list-container mb-3"
+        aria-label="Default select example"
+        onChange={(e) => setActiveParcel(e.target.value)}
+      >
+        <option value="" selected>
+          All Parcels
+        </option>
+        {renderParcelList()}
+      </select>
       <ul className="nav nav-tabs mb-3">
         <li className="nav-item">
           <a
