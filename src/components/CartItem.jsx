@@ -37,7 +37,7 @@ function CartItem(props) {
                   {Object.keys(cartItem.products).join(", ")}
                 </p>
                 <Link
-                  to={`/parcel/${cartReducer.id_parcel}/${cartItem.id_cart}`}
+                  to={`/parcel/${cartItem.id_parcel}/${cartItem.id_cart}`}
                   className="link-primary"
                 >
                   Edit products

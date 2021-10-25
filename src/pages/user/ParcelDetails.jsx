@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 function ParcelDetails(props) {
   //Get id_parcel from route params
   const id_parcel = props.match.params.id_parcel;
+  const id_cart = props.match.params.id_cart;
 
   //Dispatch
   const dispatch = useDispatch();
@@ -47,7 +48,7 @@ function ParcelDetails(props) {
   const [sortBy, setSortBy] = useState("");
 
   //State for saving added products & quantity
-  const [addedProducts, setAddedProducts] = useState(cartReducer.products);
+  const [addedProducts, setAddedProducts] = useState([]);
 
   //State for product details modal
   const [modalToggle, setModalToggle] = useState({
@@ -228,23 +229,46 @@ function ParcelDetails(props) {
     }
 
     if (authReducer.username) {
-      console.log(`addedProducts: `, addedProducts);
       if (cartReady) {
         Axios.post(`${API_URL}/cart/add`, {
           id_user: authReducer.id_user,
           id_parcel: id_parcel,
           products: addedProducts,
         }).then((res) => {
-          console.log(`id_cart:`, res.data.data);
           alert("Parcel added to cart!");
+
+          let cartArray = [];
+
+          res.data.data.forEach((val) => {
+            let index = cartArray.findIndex((el) => el.id_cart === val.id_cart);
+
+            if (index === -1) {
+              const {id_parcel, id_cart, id_user, parcel_name, parcel_price, image_parcel } =
+                val;
+
+              let products = {};
+              products[val.product_name] = val.product_quantity;
+
+              cartArray.push({
+                id_parcel,
+                id_cart,
+                id_user,
+                parcel_name,
+                parcel_price,
+                image_parcel,
+                products,
+              });
+            } else {
+              cartArray[index].products[val.product_name] =
+                val.product_quantity;
+            }
+
+            // setCartItems([...cartArray]);
+          });
           // Set global state
           dispatch({
             type: "ADD_CART",
-            payload: {
-              id_parcel: id_parcel,
-              id_cart: res.data.data,
-              products: addedProducts,
-            },
+            payload: cartArray
           });
         });
       } else {
@@ -256,22 +280,33 @@ function ParcelDetails(props) {
   };
 
   const editToCart = () => {
-    console.log(`parcelData`, parcelData);
-    console.log(`selectedCategories`, selectedCategories);
-
     //Get array of categories
     const categories = Object.keys(parcelData.categories);
 
-    console.log(`selectedCategories2`, selectedCategories);
-
     let cartReady = true;
 
+    let loop = true;
+
+    while (loop) {
+      for (let i = 0; i < categories.length; i++) {
+        if (
+          selectedCategories[categories[i]] !==
+          parcelData.categories[categories[i]]
+        ) {
+          //if quantity of the category not eligible
+          cartReady = false;
+          loop = false;
+        }
+      }
+
+      loop = false;
+    }
+
     if (authReducer.username) {
-      console.log(`addedProducts: `, addedProducts);
       if (cartReady) {
         Axios.patch(`${API_URL}/cart/edit`, {
           id_user: authReducer.id_user,
-          id_cart: cartReducer.id_cart,
+          id_cart: id_cart,
           id_parcel: id_parcel,
           products: addedProducts,
         }).then((res) => {
@@ -426,8 +461,6 @@ function ParcelDetails(props) {
 
   //Render added product cards
   const renderAddedProductCards = () => {
-    console.log(`addedProduct : `, addedProducts);
-    console.log(`cartReducer: `, cartReducer);
     return addedProducts.map((product, index) => {
       if (product.selected > 0) {
         console.log(`product:`, product);
@@ -543,7 +576,7 @@ function ParcelDetails(props) {
                 ) : (
                   <p className="text-muted">Added products will appear here</p>
                 )}
-                {cartReducer.id_cart ? (
+                {cartReducer.carts.length !== 0 ? (
                   <button className="btn btn-primary mt-3" onClick={editToCart}>
                     Edit Parcel to Cart
                   </button>
