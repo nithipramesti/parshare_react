@@ -121,15 +121,13 @@ function Parcels(){
     setEditParcel({ ...editParcel, [name]: value });
   }
 
-  const finalPriceParcel = () => {
+  const totalCapitalParcel = () => {
     let totalModal = 0
-    let totalPriceParcel = 0
-    let margin = parseInt(inputParcel.margin)
-    console.log(`selectCategory length :`, selectCategory.length)
-    console.log(`avgPriceProductCategory : `, avgPriceProductCategory)
-    console.log(`avgPriceProductCategory length : `,avgPriceProductCategory.length)
+    // console.log(`selectCategory length :`, selectCategory.length)
+    // console.log(`avgPriceProductCategory : `, avgPriceProductCategory)
+    // console.log(`avgPriceProductCategory length : `,avgPriceProductCategory.length)
     for(let i=0;i<selectCategory.length;i++){
-      console.log(`perulangan i ke ${i}`)
+      // console.log(`perulangan i ke ${i}`)
       if(selectCategory[i].category===""){
         selectCategory[i].category = 1
       }else{
@@ -137,57 +135,23 @@ function Parcels(){
       }
       let id_category_selected = selectCategory[i].category
       let category_quantity_selected = parseInt(selectCategory[i].quantity)
-      console.log(`id_category_selected : `,id_category_selected)
+      // console.log(`id_category_selected : `,id_category_selected)
       for(let j=0;j<avgPriceProductCategory.length;j++){
-        console.log(`perulangan j ke ${j}`)
+        // console.log(`perulangan j ke ${j}`)
         if(id_category_selected === avgPriceProductCategory[j].id_category){
-          console.log(`avgPriceProductCategory : `,avgPriceProductCategory[j].average_price)
-          console.log(`selectCategory quantity : `, category_quantity_selected)
+          // console.log(`avgPriceProductCategory : `,avgPriceProductCategory[j].average_price)
+          // console.log(`selectCategory quantity : `, category_quantity_selected)
           totalModal = totalModal + (avgPriceProductCategory[j].average_price * category_quantity_selected)
         }
       }
     }
-    console.log(`totalModal : `, totalModal)
-    totalPriceParcel = totalModal + margin
-    console.log(`totalPriceParcel : `, totalPriceParcel)
-    return Math.floor(totalPriceParcel)
-  }
-
-  const finalEditPriceParcel = () => {
-    let totalModal = 0
-    let totalPriceParcel = 0
-    let margin = parseInt(editParcel.margin)
-    console.log(`selectCategory length :`, selectCategory.length)
-    console.log(`avgPriceProductCategory : `, avgPriceProductCategory)
-    console.log(`avgPriceProductCategory length : `,avgPriceProductCategory.length)
-    for(let i=0;i<selectCategory.length;i++){
-      console.log(`perulangan i ke ${i}`)
-      if(selectCategory[i].category===""){
-        selectCategory[i].category = 1
-      }else{
-        selectCategory[i].category = parseInt(selectCategory[i].category)
-      }
-      let id_category_selected = selectCategory[i].category
-      let category_quantity_selected = parseInt(selectCategory[i].quantity)
-      console.log(`id_category_selected : `,id_category_selected)
-      for(let j=0;j<avgPriceProductCategory.length;j++){
-        console.log(`perulangan j ke ${j}`)
-        if(id_category_selected === avgPriceProductCategory[j].id_category){
-          console.log(`avgPriceProductCategory : `,avgPriceProductCategory[j].average_price)
-          console.log(`selectCategory quantity : `, category_quantity_selected)
-          totalModal = totalModal + (avgPriceProductCategory[j].average_price * category_quantity_selected)
-        }
-      }
-    }
-    console.log(`totalModal : `, totalModal)
-    totalPriceParcel = totalModal + margin
-    console.log(`totalPriceParcel : `, totalPriceParcel)
-    return Math.floor(totalPriceParcel)
+    // console.log(`totalModal : `, totalModal)
+    return Math.floor(totalModal)
   }
 
   const submitAddParcelHandler = () => {
     if(inputImage.image && inputParcel.name && inputParcel.margin && inputParcel.description ){
-      let price = finalPriceParcel()
+      let price = totalCapitalParcel() + parseInt(inputParcel.margin)
       console.log(price)
       let formData = new FormData();
       let obj = {
@@ -235,7 +199,7 @@ function Parcels(){
   const submitEditParcelHandler = () => {
     console.log(`editParcel :`, editParcel)
     if(editParcel.id && editParcel.image && editParcel.name && editParcel.margin && editParcel.description ){
-      let price = finalEditPriceParcel()
+      let price = totalCapitalParcel() + parseInt(editParcel.margin)
       console.log(price)
       let formData = new FormData();
       let obj = {
@@ -510,7 +474,7 @@ function Parcels(){
                 {display: 'block'}
               : {display: 'none'}
             }>
-              <img id="preview" style={{display: "inline-block"}}></img>
+              <img id="preview" style={{display: "inline-block", height: "140px", width: "140px"}} ></img>
             </div>
             <label htmlFor="form-email" className="form-label">
               Image
@@ -600,18 +564,37 @@ function Parcels(){
             <div className="mb-2">
               <button type="button" className="btn btn-primary" onClick={handleAddCategory}>Add Category</button>
             </div>
-            <label htmlFor="form-email" className="form-label">
-              Margin
-            </label>
-            <input
-              type="number"
-              className="form-control"
-              placeholder="Margin"
-              name="margin"
-              onChange={addInputHandler}
-              value={inputParcel.margin}
-              required
-            />
+            <div className="row">
+              <div className="col-md-8">
+                <label htmlFor="form-email" className="form-label">
+                  Margin
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  className="form-control"
+                  placeholder="Margin"
+                  name="margin"
+                  onChange={addInputHandler}
+                  value={inputParcel.margin}
+                  required
+                />
+              </div>
+              <div className="col-md-4">
+                <label htmlFor="form-email" className="form-label">
+                    Capital
+                  </label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder="0"
+                    name="margin"
+                    onChange={addInputHandler}
+                    value={totalCapitalParcel()}
+                    disabled
+                  />
+              </div>
+            </div>
             <div className="row">
               <div className="col-md-6">
                 <button type="button" onClick={submitAddParcelHandler} className="btn btn-success w-100 mt-3">Add</button>
@@ -636,7 +619,7 @@ function Parcels(){
               : null
             }
             <div className="container">
-              <img src={`${API_URL}/${editParcel.image}`} id="edit_preview" style={{display: "inline-block"}}></img>
+              <img src={`${API_URL}/${editParcel.image}`} id="edit_preview" style={{display: "inline-block", height: "140px", width: "140px"}}></img>
               {/* <img id="edit_preview" width="150px" style={
               editImage.image ?
                 {display: 'inline-block'}
@@ -731,18 +714,37 @@ function Parcels(){
               <button type="button" className="btn btn-primary" onClick={handleAddCategory}>Add Category</button>
             </div>
 
-            <label htmlFor="form-email" className="form-label">
-              Margin
-            </label>
-            <input
-              type="number"
-              className="form-control"
-              placeholder="Margin"
-              name="margin"
-              onChange={editParcelHandler}
-              value={editParcel.margin}
-              required
-            />
+            <div className="row">
+              <div className="col-md-8">
+                <label htmlFor="form-email" className="form-label">
+                  Margin
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  className="form-control"
+                  placeholder="Margin"
+                  name="margin"
+                  onChange={editParcelHandler}
+                  value={editParcel.margin}
+                  required
+                />
+              </div>
+              <div className="col-md-4">
+                <label htmlFor="form-email" className="form-label">
+                    Capital
+                  </label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder= "0"
+                    name="margin"
+                    onChange={editParcelHandler}
+                    value={totalCapitalParcel()}
+                    disabled
+                  />
+              </div>
+            </div>
 
             <div className="row">
               <div className="col-md-4">
