@@ -13,9 +13,11 @@ function Stats(){
   const [ incomeOptions, setIncomeOptions ] = useState({});
   const [ parcelSeries, setParcelSeries ] = useState([]);
   const [ parcelOptions, setParcelOptions ] = useState({});
+  const [ selectPeriod, setSelectPeriod ] = useState(30);
+  const [ availablePeriods, setAvailablePeriods ] = useState([7, 14, 30]);
 
-  const fetchIncome = () => {
-    Axios.get(`${API_URL}/transactions/income`, {
+  const fetchIncome = (period) => {
+    Axios.get(`${API_URL}/transactions/income?period=${period}`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem("token_parshare")}`
       }
@@ -79,8 +81,8 @@ function Stats(){
       alert("Error: " + err.message);
     })
   }
-  const fetchParcelData = (id) => {
-    Axios.get(`${API_URL}/parcels/revenue?id=${id}`, {
+  const fetchParcelData = (id, period) => {
+    Axios.get(`${API_URL}/parcels/revenue?id=${id}&period=${period}`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem("token_parshare")}`
       }
@@ -167,7 +169,12 @@ function Stats(){
   const changeParcel = (e) => {
     const value = e.target.value;
     setSelectParcel(value);
-    fetchParcelData(value);
+    fetchParcelData(value, selectPeriod);
+  }
+  const selectPeriodHandler = (period) => {
+    setSelectPeriod(period);
+    fetchParcelData(selectParcel, period);
+    fetchIncome(period);
   }
 
   useEffect(() => {
@@ -185,21 +192,40 @@ function Stats(){
   }else{
     return (
       <div className="container container-top">
-        <h1>Income</h1>
-        <Chart options={incomeOptions} type="area" series={incomeSeries} width="100%" height="300px" />
-        <h1 style={{display: 'inline-block'}}>Parcels</h1>
-        <select style={{display: 'inline-block', width: "initial", marginLeft: "10px"}} class="form-select" aria-label="Default select example" name="parcel" onChange={changeParcel}>
-          {
-            parcelList.map(parcel => {
-              if(selectParcel === parcel.id_parcel){
-                return <option value={parcel.id_parcel} selected>{parcel.parcel_name}</option>
-              }else{
-                return <option value={parcel.id_parcel}>{parcel.parcel_name}</option>
-              }
-            })
-          }
-        </select>
-        <Chart options={parcelOptions} type="area" series={parcelSeries} width="100%" height="300px" />
+        <h1 style={{display: "inline-block", marginRight: "10px"}}>Statictics</h1>
+        {
+          availablePeriods.map(res => {
+            return(
+              <div className="border border-secondary" onClick={() => selectPeriodHandler(res)} style={
+                res === selectPeriod ?
+                  {cursor: "pointer", background: "#041E43", color: "#fff", display: 'inline-block', padding: "2px 10px 2px 10px", minWidth: "60px", marginRight: "3px", borderRadius: "20px", marginBottom: "2px", textAlign: "center"}
+                : {cursor: "pointer", background: "#fff", color: "#000", display: 'inline-block', padding: "2px 10px 2px 10px", minWidth: "60px", marginRight: "3px", borderRadius: "20px", marginBottom: "2px", textAlign: "center"}
+              }>
+                {res} days
+              </div>
+            )
+          })
+        }
+        <div className="border rounded">
+          <h5 style={{marginTop: "10px", marginLeft: "10px"}}>Total income in {selectPeriod} days</h5>
+          <Chart options={incomeOptions} type="area" series={incomeSeries} width="100%" height="300px" />
+        </div>
+        <div className="border rounded mt-4">
+          <h5 style={{marginTop: "10px", marginLeft: "10px", display: "inline-block"}}>Total parcel</h5>
+          <select style={{display: 'inline-block', width: "initial", marginLeft: "10px", marginRight: "10px"}} class="form-select" aria-label="Default select example" name="parcel" onChange={changeParcel}>
+            {
+              parcelList.map(parcel => {
+                if(selectParcel === parcel.id_parcel){
+                  return <option value={parcel.id_parcel} selected>{parcel.parcel_name}</option>
+                }else{
+                  return <option value={parcel.id_parcel}>{parcel.parcel_name}</option>
+                }
+              })
+            }
+          </select>
+          <h5 style={{display: 'inline-block', marginRight: "10px"}}>sold in {selectPeriod} days</h5>
+          <Chart options={parcelOptions} type="area" series={parcelSeries} width="100%" height="300px" />
+        </div>
       </div>
     )
   }
