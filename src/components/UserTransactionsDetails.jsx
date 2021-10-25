@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import Axios from "axios";
 import { API_URL } from "../data/API";
+import { useHistory } from 'react-router'
 
 export const UserTransactionsDetails = (props) => {
   //State for proof payment photo
   const [imageModal, setImageModal] = useState(false);
   const [ inputImage, setInputImage ] = useState({});
+
+  const history = useHistory()
 
   //Destructuring transaction data (from props)
   const {
@@ -63,6 +66,7 @@ export const UserTransactionsDetails = (props) => {
 
   //Render parcels
   const renderParcels = () => {
+    console.log(`transactionData`,props.transactionData)
     return parcels.map((parcel) => {
       return (
         <div className="parcel-product d-flex mb-2">
@@ -130,14 +134,29 @@ const addImgPayment = () => {
     })
     .then(res => {
         alert(res.data.message)
+        history.go(0)
     })
     .catch(error => {
         alert("Failed")
     });
   }
 
-
-  ///////////////
+const showButtonUpload = () => {
+  if(status === "Pending"){
+    return(
+      <div className="button-container mt-3">
+        <input
+        type="file"
+        className="btn"
+        name="image_userpayment"
+        onChange={inputImageHandler}
+        required
+      />
+      <button onClick={addImgPayment} className="btn btn-primary">Upload Photo</button>
+      </div>
+    )
+  }
+}
 
   return (
     <div className={`details-bg m-0 p-0`} tabindex="-1">
@@ -193,12 +212,6 @@ const addImgPayment = () => {
                       {`Rp ${transaction_totalprice.toLocaleString()}`}
                     </p>
                   </div>
-                  {/* <div className="profit">
-                    <p className="mt-0 mb-1">
-                      <strong>Profit: </strong>
-                      {`Rp ${income.toLocaleString()}`}
-                    </p>
-                  </div> */}
                 </div>
               </div>
               <div className="parcel-container">
@@ -251,32 +264,9 @@ const addImgPayment = () => {
                     </svg>
                     <span className="ms-1">Please Upload Payment Proof</span>
                   </p>
-                  <input
-                    type="file"
-                    className="btn"
-                    name="image_userpayment"
-                    onChange={inputImageHandler}
-                    required
-                  />
-                  <button onClick={addImgPayment} className="btn btn-primary">Upload Photo</button>
+                  {showButtonUpload()}
                   </>
                 )}
-                {/* {status === "Pending" && (
-                  <div className="button-container mt-3">
-                    <button
-                      className="btn btn-success mb-2"
-                      onClick={() => transactionConfirmation("Confirmed")}
-                    >
-                      Confirm Transaction
-                    </button>
-                    <button
-                      className="btn btn-danger mb-2"
-                      onClick={() => transactionConfirmation("Rejected")}
-                    >
-                      Reject Transaction
-                    </button>
-                  </div>
-                )} */}
               </div>
             </div>
           </div>

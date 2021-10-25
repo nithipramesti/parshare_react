@@ -237,39 +237,39 @@ function ParcelDetails(props) {
         }).then((res) => {
           alert("Parcel added to cart!");
 
-          let cartArray = [];
+          // let cartArray = [];
 
-          res.data.data.forEach((val) => {
-            let index = cartArray.findIndex((el) => el.id_cart === val.id_cart);
+          // res.data.data.forEach((val) => {
+          //   let index = cartArray.findIndex((el) => el.id_cart === val.id_cart);
 
-            if (index === -1) {
-              const {id_parcel, id_cart, id_user, parcel_name, parcel_price, image_parcel } =
-                val;
+          //   if (index === -1) {
+          //     const {id_parcel, id_cart, id_user, parcel_name, parcel_price, image_parcel } =
+          //       val;
 
-              let products = {};
-              products[val.product_name] = val.product_quantity;
+          //     let products = {};
+          //     products[val.product_name] = val.product_quantity;
 
-              cartArray.push({
-                id_parcel,
-                id_cart,
-                id_user,
-                parcel_name,
-                parcel_price,
-                image_parcel,
-                products,
-              });
-            } else {
-              cartArray[index].products[val.product_name] =
-                val.product_quantity;
-            }
+          //     cartArray.push({
+          //       id_parcel,
+          //       id_cart,
+          //       id_user,
+          //       parcel_name,
+          //       parcel_price,
+          //       image_parcel,
+          //       products,
+          //     });
+          //   } else {
+          //     cartArray[index].products[val.product_name] =
+          //       val.product_quantity;
+          //   }
 
-            // setCartItems([...cartArray]);
-          });
-          // Set global state
-          dispatch({
-            type: "ADD_CART",
-            payload: cartArray
-          });
+          //   // setCartItems([...cartArray]);
+          // });
+          // // Set global state
+          // dispatch({
+          //   type: "ADD_CART",
+          //   payload: cartArray
+          // });
         });
       } else {
         alert(`Please select ${renderCategories()}`);
