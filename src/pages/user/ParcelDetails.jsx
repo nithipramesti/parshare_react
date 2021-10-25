@@ -5,15 +5,22 @@ import { useEffect, useState } from "react";
 import Axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import AddedProductCard from "../../components/AddedProductCard";
-import { Link } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 
 function ParcelDetails(props) {
   //Get id_parcel from route params
   const id_parcel = props.match.params.id_parcel;
-  const id_cart = props.match.params.id_cart;
+
+  //Get id_cart from query params
+  const search = useLocation().search;
+  const id_cart = new URLSearchParams(search).get("id_cart");
+  // const id_cart = props.match.params.id_cart;
 
   //Dispatch
   const dispatch = useDispatch();
+
+  //For redirecting
+  const history = useHistory();
 
   //Global state
   const authReducer = useSelector((state) => state.authReducer);
@@ -55,6 +62,9 @@ function ParcelDetails(props) {
     displayed: false,
     product: {},
   });
+
+  //State for saving added products & quantity
+  const [alertMessage, setAlertMessage] = useState("");
 
   //Function for pagination
   const paginationHandler = (direction) => {
@@ -160,48 +170,52 @@ function ParcelDetails(props) {
         ar[indexProduct].product_quantity += addedProduct.selected;
         setProducts([...ar]);
 
-        //Set props selected in addedProduct to 0
-        addedProduct.selected = 0;
+        //Delete product from addedProducts
+        let arr = addedProducts;
+        arr.splice(index, 1);
+        setAddedProducts([...arr]);
       }
     }
   };
 
   //Function to add product
   const addProduct = (id_product) => {
-    //Add selected product to state addedProducts:
+    //Check if user already login & not an admin
+    if (authReducer.role === "user") {
+      //Check if user have filled their profile data
+      if (authReducer.fullname && authReducer.address) {
+        //Find index in addProducts
+        const indexAddedProduct = addedProducts.findIndex(
+          (el) => el.id_product === id_product
+        );
 
-    //Find index in addProducts
-    const indexAddedProduct = addedProducts.findIndex(
-      (el) => el.id_product === id_product
-    );
+        //Get product data with selected id_product
+        let addedProduct = products.find((el) => el.id_product === id_product);
 
-    //Get product data with selected id_product
-    let addedProduct = products.find((el) => el.id_product === id_product);
+        if (indexAddedProduct === -1) {
+          //If the product not added before:
 
-    if (indexAddedProduct === -1) {
-      //If the product not added before:
+          //Push product to addedProducts, with props selected = 0
+          let ar = addedProducts;
+          ar.push({ ...addedProduct, selected: 0 });
+          setAddedProducts([...ar]);
 
-      //Push product to addedProducts, with props selected = 0
-      let ar = addedProducts;
-      ar.push({ ...addedProduct, selected: 0 });
-      setAddedProducts([...ar]);
+          //Add product to addedProducts using function editQty
+          editQty(addedProducts.length - 1, "increment");
+        } else {
+          //If its already added before:
 
-      //Add product to addedProducts using function editQty
-      editQty(addedProducts.length - 1, "increment");
+          //Add product to addedProducts using function editQty
+          editQty(indexAddedProduct, "increment");
+        }
+      } else {
+        setAlertMessage(
+          "Please fill your fullname & address in your account setting."
+        );
+      }
     } else {
-      //If its already added before:
-
-      //Add product to addedProducts using function editQty
-      editQty(indexAddedProduct, "increment");
+      setAlertMessage("Please log in or register first.");
     }
-
-    console.log(selectedCategories);
-
-    //exceeded category quantity ALERT
-
-    //Increment selected product-category
-
-    //Decrement selected product quantity in state (in database after transaction succeed)
   };
 
   //Function to add parcel to CART
@@ -228,54 +242,51 @@ function ParcelDetails(props) {
       loop = false;
     }
 
-    if (authReducer.username) {
-      if (cartReady) {
-        Axios.post(`${API_URL}/cart/add`, {
-          id_user: authReducer.id_user,
-          id_parcel: id_parcel,
-          products: addedProducts,
-        }).then((res) => {
-          alert("Parcel added to cart!");
+    if (cartReady) {
+      Axios.post(`${API_URL}/cart/add`, {
+        id_user: authReducer.id_user,
+        id_parcel: id_parcel,
+        products: addedProducts,
+      }).then((res) => {
+        let cartArray = [];
 
-          let cartArray = [];
+        res.data.data.forEach((val) => {
+          let index = cartArray.findIndex((el) => el.id_cart === val.id_cart);
 
-          res.data.data.forEach((val) => {
-            let index = cartArray.findIndex((el) => el.id_cart === val.id_cart);
+          if (index === -1) {
+            const {
+              id_parcel,
+              id_cart,
+              id_user,
+              parcel_name,
+              parcel_price,
+              image_parcel,
+            } = val;
 
-            if (index === -1) {
-              const {id_parcel, id_cart, id_user, parcel_name, parcel_price, image_parcel } =
-                val;
+            let products = {};
+            products[val.product_name] = val.product_quantity;
 
-              let products = {};
-              products[val.product_name] = val.product_quantity;
-
-              cartArray.push({
-                id_parcel,
-                id_cart,
-                id_user,
-                parcel_name,
-                parcel_price,
-                image_parcel,
-                products,
-              });
-            } else {
-              cartArray[index].products[val.product_name] =
-                val.product_quantity;
-            }
-
-            // setCartItems([...cartArray]);
-          });
-          // Set global state
-          dispatch({
-            type: "ADD_CART",
-            payload: cartArray
-          });
+            cartArray.push({
+              id_parcel,
+              id_cart,
+              id_user,
+              parcel_name,
+              parcel_price,
+              image_parcel,
+              products,
+            });
+          } else {
+            cartArray[index].products[val.product_name] = val.product_quantity;
+          }
         });
-      } else {
-        alert(`Please select ${renderCategories()}`);
-      }
+
+        //Redirect to cart page
+        history.push("/user/cart");
+      });
     } else {
-      alert("Please login first");
+      setAlertMessage(
+        `Please choose the product with the correct quantity: ${renderCategories()}`
+      );
     }
   };
 
@@ -302,21 +313,19 @@ function ParcelDetails(props) {
       loop = false;
     }
 
-    if (authReducer.username) {
-      if (cartReady) {
-        Axios.patch(`${API_URL}/cart/edit`, {
-          id_user: authReducer.id_user,
-          id_cart: id_cart,
-          id_parcel: id_parcel,
-          products: addedProducts,
-        }).then((res) => {
-          alert("Success Edit");
-        });
-      } else {
-        alert(`Please select ${renderCategories()}`);
-      }
+    if (cartReady) {
+      Axios.patch(`${API_URL}/cart/edit`, {
+        id_user: authReducer.id_user,
+        id_cart: id_cart,
+        id_parcel: id_parcel,
+        products: addedProducts,
+      }).then((res) => {
+        history.push("/user/cart");
+      });
     } else {
-      alert("Please login first");
+      setAlertMessage(
+        `Please choose the product with the correct quantity: ${renderCategories()}`
+      );
     }
   };
 
@@ -342,26 +351,35 @@ function ParcelDetails(props) {
                 ></button>
               </div>
               <div className="modal-body d-flex">
-                {/* <img
-                  src={`${API_URL}/${modalToggle.product.image_product}`}
+                <img
+                  className="pe-3"
+                  src={`${API_URL}${modalToggle.product.image_product}`}
                   alt=""
-                /> */}
-                <div className="info-text">
-                  <p>
-                    <strong>Category: </strong> {modalToggle.product.category}
-                  </p>
-                  <p>
-                    <strong>Description:</strong>
-                    <br />
-                    {modalToggle.product.description}
-                  </p>
+                />
+                <div className="info-text pe-4">
+                  <div>
+                    <p className="mb-0">
+                      <strong>Category: </strong>
+                    </p>
+                    <p className="text-muted">{modalToggle.product.category}</p>
+                  </div>
+                  <div>
+                    <p className="mb-0">
+                      <strong>Description:</strong>
+                    </p>
+                    <p className="product-details-modal text-muted">
+                      {modalToggle.product.description}
+                    </p>
+                  </div>
                 </div>
               </div>
               <div className="modal-footer">
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  onClick={() => setModalToggle(false)}
+                  onClick={() =>
+                    setModalToggle({ displayed: true, products: {} })
+                  }
                 >
                   Close
                 </button>
@@ -387,6 +405,10 @@ function ParcelDetails(props) {
       console.log("arr", arr);
     }
     setFilteredProducts([...arr]);
+
+    const maxPage = Math.ceil(arr.length / pagination.itemPerPage);
+    setPagination({ ...pagination, maxPage, page: 1 });
+    console.log(maxPage);
   }, [filterCategory]);
 
   //Render categories filter
@@ -476,6 +498,15 @@ function ParcelDetails(props) {
     });
   };
 
+  //Render alert message
+  const renderAlertMsg = () => {
+    return (
+      <div className="alert alert-warning alert-msg px-5 mb-2" role="alert">
+        {alertMessage}
+      </div>
+    );
+  };
+
   //Fetching product data
   useEffect(() => {
     //Send request to backend
@@ -504,7 +535,7 @@ function ParcelDetails(props) {
 
           setIsLoading(false);
         } else {
-          console.log(res.data.errMessage);
+          alert(res.data.errMessage);
         }
       })
       .catch((err) => {
@@ -515,25 +546,30 @@ function ParcelDetails(props) {
   if (isLoading) {
     return (
       <div className="parcel-detail">
-        <p>Loading products data...</p>
+        <div className="text-center pt-5">
+          <div className="spinner-border" role="status">
+            <span class="visually-hidden">Loading transactions data...</span>
+          </div>
+        </div>
       </div>
     );
   } else {
     return (
       <div className="parcel-detail">
+        {alertMessage && renderAlertMsg()}
         <div className="mx-5 main">
-          <nav className="breadcrumb-container" aria-label="breadcrumb">
-            <ol className="breadcrumb">
-              <li className="breadcrumb-item">
-                <Link to="/">Parcels</Link>
-              </li>
-              <li className="breadcrumb-item active" aria-current="page">
-                {parcelData.name}
-              </li>
-            </ol>
-          </nav>
           <div className="row">
-            <div className="parcel-info mb-3">
+            <div className="parcel-info ps-0 mb-3">
+              <nav className="breadcrumb-container" aria-label="breadcrumb">
+                <ol className="breadcrumb">
+                  <li className="breadcrumb-item">
+                    <Link to="/">Parcels</Link>
+                  </li>
+                  <li className="breadcrumb-item active" aria-current="page">
+                    {parcelData.name}
+                  </li>
+                </ol>
+              </nav>
               {parcelData.name && <h1 className="mb-1">{parcelData.name}</h1>}
               <div className="sub-info">
                 <p className="categories mb-2 text-muted">
@@ -576,7 +612,7 @@ function ParcelDetails(props) {
                 ) : (
                   <p className="text-muted">Added products will appear here</p>
                 )}
-                {cartReducer.carts.length !== 0 ? (
+                {id_cart ? (
                   <button className="btn btn-primary mt-3" onClick={editToCart}>
                     Edit Parcel to Cart
                   </button>

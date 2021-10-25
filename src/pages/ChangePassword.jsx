@@ -132,7 +132,7 @@ function ChangePassword(props) {
     return (
       <div className="reset-password container-fluid">
         <div className="container-reset-password container d-flex flex-column align-items-center">
-          <h1 className="mb-5 fw-bold">Change Password</h1>
+          <h1 className="mb-5">Change Password</h1>
           {resMessage.error && (
             <div className="alert alert-danger" role="alert">
               {resMessage.error}

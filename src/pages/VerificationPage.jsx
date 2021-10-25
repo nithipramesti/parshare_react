@@ -3,9 +3,11 @@ import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import { API_URL } from "../data/API";
 import { useHistory } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 function Login(props) {
   let history = useHistory();
+  const dispatch = useDispatch();
 
   const [verification, setVerification] = useState({
     message: "wait a minute...",
@@ -29,6 +31,12 @@ function Login(props) {
           success: true,
         });
         localStorage.setItem("token_parshare", res.data.token);
+
+        //Set global state
+        dispatch({
+          type: "USER_LOGIN",
+          payload: res.data.dataLogin,
+        });
       })
       .catch((err) => {
         console.log(err);

@@ -3,6 +3,7 @@ import "../assets/styles/home.css";
 import { useSelector } from "react-redux";
 import Axios from "axios";
 import { useEffect, useState } from "react";
+import { Redirect } from "react-router-dom";
 import { API_URL } from "../data/API";
 import ParcelCard from "../components/ParcelCard";
 
@@ -75,26 +76,40 @@ function Home() {
 
   let username = authReducer.username;
 
-  return (
-    <div className="home">
-      <main className="">
-        <div className="main-left">
-          <h1 className="headline-text mb-5">
-            Make someone’s <br />
-            day with our <br />
-            <em>special parcel</em>
-          </h1>
-          <a className="btn btn-primary" id="btn-main" href="#parcel-section">
-            Shop Parcels
-          </a>
+  if (authReducer.role === "admin") {
+    return <Redirect to="/admin/products" />;
+  } else {
+    return (
+      <div className="home">
+        <main className="">
+          <div className="main-left">
+            <h1 className="headline-text mb-5">
+              Make someone’s <br />
+              day with our <br />
+              <em>special parcel</em>
+            </h1>
+            <a className="btn btn-primary" id="btn-main" href="#parcel-section">
+              Shop Parcels
+            </a>
+          </div>
+          <div className="main-right"></div>
+        </main>
+        <div id="parcel-section">
+          {parcelData.length ? (
+            renderParcels()
+          ) : (
+            <div className="spinner-container text-center">
+              <div className="spinner-border" role="status">
+                <span class="visually-hidden">
+                  Loading transactions data...
+                </span>
+              </div>
+            </div>
+          )}
         </div>
-        <div className="main-right"></div>
-      </main>
-      <div id="parcel-section">
-        {parcelData.length ? renderParcels() : <p>Loading parcel data...</p>}
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 export default Home;

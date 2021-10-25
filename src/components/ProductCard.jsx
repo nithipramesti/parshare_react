@@ -15,9 +15,6 @@ function ProductCard(props) {
       <div className="card-body">
         <p className="card-text mb-1 d-flex justify-content-between">
           <small className="text-muted">{productData.category}</small>
-          {/* <small className="text-muted">
-            {`Stock: ${productData.product_quantity}`}
-          </small> */}
         </p>
         <h6
           className="card-title mb-3"

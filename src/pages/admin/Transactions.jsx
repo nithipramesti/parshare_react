@@ -5,8 +5,13 @@ import AdminTransactionsCard from "../../components/AdminTransactionsCard";
 import { API_URL } from "../../data/API";
 import { compile } from "date-and-time";
 import AdminTransactionsDetails from "../../components/AdminTransactionsDetails";
+import { Redirect } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export const Transactions = () => {
+  //Get global state data
+  const authReducer = useSelector((state) => state.authReducer);
+
   //State to save transaction data
   const [transactionsData, setTransactionsData] = useState([]);
 
@@ -181,45 +186,57 @@ export const Transactions = () => {
 
   //////////
 
-  return (
-    <div className="transactions-admin mb-5">
-      <h1 className="mb-4">Transactions</h1>
-      <select
-        className="form-select parcel-list-container mb-3"
-        aria-label="Default select example"
-        onChange={(e) => setActiveParcel(e.target.value)}
-      >
-        <option value="" selected>
-          All Parcels
-        </option>
-        {renderParcelList()}
-      </select>
-      <ul className="nav nav-tabs mb-3">
-        <li className="nav-item">
-          <a
-            className={`nav-link ${filterStatus === `Pending` ? `active` : ""}`}
-            onClick={() => setFilterStatus("Pending")}
-          >
-            Pending
-          </a>
-        </li>
-        <li className="nav-item">
-          <a
-            className={`nav-link ${
-              filterStatus === `Completed` ? `active` : ""
-            }`}
-            onClick={() => setFilterStatus("Completed")}
-          >
-            Completed
-          </a>
-        </li>
-      </ul>
-      {transactionsData[0] && renderTransactionCards()}
-      {transactionsData[0] &&
-        modalToggle.displayed &&
-        renderTransactionDetails()}
-    </div>
-  );
+  if (authReducer.role === "admin") {
+    return (
+      <div className="transactions-admin mb-5">
+        <h1 className="mb-4">Transactions</h1>
+        <select
+          className="form-select parcel-list-container mb-3"
+          aria-label="Default select example"
+          onChange={(e) => setActiveParcel(e.target.value)}
+        >
+          <option value="" selected>
+            All Parcels
+          </option>
+          {renderParcelList()}
+        </select>
+        <ul className="nav nav-tabs mb-3">
+          <li className="nav-item">
+            <a
+              className={`nav-link ${
+                filterStatus === `Pending` ? `active` : ""
+              }`}
+              onClick={() => setFilterStatus("Pending")}
+            >
+              Pending
+            </a>
+          </li>
+          <li className="nav-item">
+            <a
+              className={`nav-link ${
+                filterStatus === `Completed` ? `active` : ""
+              }`}
+              onClick={() => setFilterStatus("Completed")}
+            >
+              Completed
+            </a>
+          </li>
+        </ul>
+        {currentData[0] ? (
+          renderTransactionCards()
+        ) : (
+          <div className="text-center pt-5">
+            <div className="spinner-border" role="status">
+              <span class="visually-hidden">Loading transactions data...</span>
+            </div>
+          </div>
+        )}
+        {currentData[0] && modalToggle.displayed && renderTransactionDetails()}
+      </div>
+    );
+  } else {
+    return <Redirect to="/" />;
+  }
 };
 
 export default Transactions;
