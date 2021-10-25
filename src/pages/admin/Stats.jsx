@@ -29,8 +29,7 @@ function Stats(){
         return res.totalPrice
       });
       let date = (obj).map(res => {
-        const date = new Date(res.date);
-        return `${date.getDate()} ${date.toDateString().substr(4, 3)}`
+        return res.date
       })
       setIncomeSeries([
         {
@@ -44,7 +43,23 @@ function Stats(){
       ])
       setIncomeOptions({
         chart: {
-          id: "area"
+          id: "area",
+          toolbar: {
+            show: false
+          },
+          tools: {
+            download: false,
+            selection: false,
+            zoom: false,
+            zoomin: false,
+            zoomout: false,
+            pan: false,
+            reset: false | '<img src="/static/icons/reset.png" width="20">',
+            customIcons: []
+          },
+          zoom: {
+            enabled: false
+          }
         },
         xaxis: {
           type: "datetime",
@@ -82,8 +97,7 @@ function Stats(){
         return res.totalMargin
       });
       let date = (obj).map(res => {
-        const date = new Date(res.date);
-        return `${date.getDate()} ${date.toDateString().substr(4, 3)}`
+        return res.date
       })
       setParcelSeries([
         {
@@ -101,7 +115,23 @@ function Stats(){
       ])
       setParcelOptions({
         chart: {
-          id: "area"
+          id: "area",
+          toolbar: {
+            show: false
+          },
+          tools: {
+            download: false,
+            selection: false,
+            zoom: false,
+            zoomin: false,
+            zoomout: false,
+            pan: false,
+            reset: false | '<img src="/static/icons/reset.png" width="20">',
+            customIcons: []
+          },
+          zoom: {
+            enabled: false
+          }
         },
         xaxis: {
           type: "datetime",
