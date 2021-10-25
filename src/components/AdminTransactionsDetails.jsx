@@ -89,6 +89,7 @@ export const AdminTransactionsDetails = (props) => {
       {
         id_transaction,
         newStatus,
+        parcels,
       },
       {
         headers: {
@@ -225,7 +226,9 @@ export const AdminTransactionsDetails = (props) => {
                 {status === "Pending" && (
                   <div className="button-container mt-3">
                     <button
-                      className="btn btn-success mb-2"
+                      className={`btn btn-success mb-2 ${
+                        !image_userpayment ? `disabled` : ``
+                      }`}
                       onClick={() => transactionConfirmation("Confirmed")}
                     >
                       Confirm Transaction
