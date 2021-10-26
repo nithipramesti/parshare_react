@@ -1,12 +1,35 @@
 import { API_URL } from "../data/API";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import Axios from "axios";
 
 function CartItem(props) {
   const cartItem = props.cartItem;
-  
-  const cartReducer = useSelector((state) => state.cartReducer);
-  
+
+  //Create array to store products
+  const productsArray = [];
+  Object.keys(cartItem.products).forEach((val) => {
+    productsArray.push(
+      `${val} ${
+        cartItem.products[val] > 1 ? `(${cartItem.products[val]})` : ""
+      }`
+    );
+  });
+
+  //Function to remove item from cart
+  const removeCartItem = () => {
+    Axios.patch(`${API_URL}/cart/delete`, {
+      id_cart: cartItem.id_cart,
+    })
+      .then((res) => {
+        console.log(res.data.message);
+
+        //Refresh page
+        window.location.reload(false);
+      })
+      .catch((err) => console.log(err));
+  };
+
   return (
     <li className="list-group-item py-3">
       <div className="row g-0">
@@ -22,22 +45,25 @@ function CartItem(props) {
             <ul className="list-group list-group-flush">
               <div className="d-flex justify-content-between align-items-end">
                 <h4 className="mt-3 mb-3">{cartItem.parcel_name}</h4>
-                <p>
-                  <strong>Rp {cartItem.parcel_price}</strong>
-                </p>
+                <div className="d-flex">
+                  <p>
+                    <strong>Rp {cartItem.parcel_price.toLocaleString()}</strong>
+                  </p>
+                  <button
+                    type="button"
+                    onClick={removeCartItem}
+                    className="btn-close remove-cart ms-3"
+                    aria-label="Close"
+                  ></button>
+                </div>
               </div>
-              {/* <p className="mb-2">
-              <small className="text-muted">
-                3 Chocolate, 2 Snack, 1 Coffee
-              </small>
-            </p> */}
               <div className="parcel-products">
                 <strong>Products:</strong>
-                <p className="mb-1">
-                  {Object.keys(cartItem.products).join(", ")}
+                <p className="mb-1 cart-products text-muted">
+                  {productsArray.join(", ")}
                 </p>
                 <Link
-                  to={`/parcel/${cartItem.id_parcel}/${cartItem.id_cart}`}
+                  to={`/parcel/${cartItem.id_parcel}?id_cart=${cartItem.id_cart}`}
                   className="link-primary"
                 >
                   Edit products
@@ -45,13 +71,6 @@ function CartItem(props) {
               </div>
             </ul>
           </div>
-
-          <button
-            type="button"
-            onClick={() => props.editQty(props.index, "remove")}
-            className="btn-close ms-2 ps-4 pt-3"
-            aria-label="Close"
-          ></button>
         </div>
       </div>
     </li>

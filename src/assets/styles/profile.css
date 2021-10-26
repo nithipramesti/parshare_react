@@ -1,12 +1,13 @@
-.container-top{
-  padding-top: 80px;
+.container-top {
+  padding: 120px 0;
+  width: 1200px;
+  margin: 0 auto;
 }
 
-.container-left{
-  padding-left: 50px;
+.container-left {
   margin-bottom: 50px;
 }
 
-.container-left-photo{
+.container-left-photo {
   padding-left: 50px;
 }

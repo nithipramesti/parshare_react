@@ -5,14 +5,18 @@ import "../../assets/styles/user/cart.css";
 import CartItem from "../../components/CartItem";
 import { API_URL } from "../../data/API";
 import date from "date-and-time";
+import { useHistory } from "react-router-dom";
 
 function Cart() {
   //Global state
   const authReducer = useSelector((state) => state.authReducer);
-  const cartReducer = useSelector((state) => state.cartReducer)
+  const cartReducer = useSelector((state) => state.cartReducer);
 
   //Dispatch
   const dispatch = useDispatch();
+
+  //For redirecting
+  const history = useHistory();
 
   const [cartRaw, setCartRaw] = useState([]);
 
@@ -27,11 +31,11 @@ function Cart() {
 
   const renderCartItem = () => {
     console.log(`cartItems`, cartItems);
-    console.log(`cartReducer`, cartReducer)
-    console.log(``)
+    console.log(`cartReducer`, cartReducer);
+    console.log(``);
 
     return cartItems.map((val) => {
-      return <CartItem cartItem={val}/>;
+      return <CartItem cartItem={val} />;
     });
   };
 
@@ -88,11 +92,12 @@ function Cart() {
       cartRaw,
     }).then((res) => {
       if (res.data.message) {
-        alert(res.data.message);
+        //Redirect to cart page
+        history.push("/user/transactions");
 
-        // dispatch({
-        //   type: "RESET_CART"
-        // });
+        dispatch({
+          type: "RESET_CART",
+        });
 
         const emptyAr = [];
         setCartRaw([...emptyAr]);
@@ -102,7 +107,7 @@ function Cart() {
   };
 
   useEffect(() => {
-    console.log(`cartReducer`, cartReducer)
+    console.log(`cartReducer`, cartReducer);
     Axios.post(`${API_URL}/cart/get`, {
       id_user: authReducer.id_user,
     }).then((res) => {
@@ -114,8 +119,14 @@ function Cart() {
         let index = cartArray.findIndex((el) => el.id_cart === rawObj.id_cart);
 
         if (index === -1) {
-          const {id_parcel, id_cart, id_user, parcel_name, parcel_price, image_parcel } =
-            rawObj;
+          const {
+            id_parcel,
+            id_cart,
+            id_user,
+            parcel_name,
+            parcel_price,
+            image_parcel,
+          } = rawObj;
 
           let products = {};
           products[rawObj.product_name] = rawObj.product_quantity;
@@ -148,11 +159,12 @@ function Cart() {
             {cartItems[0] && renderCartItem()}
           </ul>
         </div>
-        <div className="text-end mt-4">
+        <div className="text-end mt-4 pe-5">
           <div className="total-price">
+            <strong className="pe-2">TOTAL:</strong>
             <strong>{`Rp ${transaction_totalprice.toLocaleString()}`}</strong>
           </div>
-          <button className="btn btn-primary mt-3" onClick={checkout}>
+          <button className="btn btn-primary mt-4" onClick={checkout}>
             Checkout
           </button>
         </div>

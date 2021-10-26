@@ -286,9 +286,6 @@ function ResetPassword(props) {
                 className="btn btn-primary py-2 container-fluid mb-3"
               />
             </form>
-          </>
-        ) : (
-          <>
             {submitLoading && (
               <div
                 className="alert alert-secondary mt-3 d-flex justify-content-center pt-3 pb-1"
@@ -300,6 +297,9 @@ function ResetPassword(props) {
                 <p>Submitting...</p>
               </div>
             )}
+          </>
+        ) : (
+          <>
             <h2 className="fw-bold">Reset Password Success</h2>
             <Link to="/login">Click here to login</Link>
           </>

@@ -98,7 +98,6 @@ export const AdminTransactionsDetails = (props) => {
       }
     )
       .then((res) => {
-        alert("Transaction status changed");
         console.log(res.data.message);
 
         //Refresh page

@@ -2,7 +2,7 @@ import "../assets/styles/auth.css";
 import React, { useState } from "react";
 import Axios from "axios";
 import { API_URL } from "../data/API";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 const Register = () => {
   let history = useHistory();
@@ -113,12 +113,15 @@ const Register = () => {
 
   const registerHandler = () => {
     if (handleValidation()) {
+      setSubmitLoading(true);
       Axios.post(`${API_URL}/users/register`, {
         email: registerForm.email,
         username: registerForm.username,
         password: registerForm.password,
       })
         .then((res) => {
+          setSubmitLoading(false);
+
           setRegisterForm({
             ...registerForm,
             message: res.data.message,
@@ -128,10 +131,6 @@ const Register = () => {
             password: "",
             confirmPassword: "",
           });
-          // alert("Register Success!, please check your email")
-          if (res.data.success === true) {
-            setTimeout(() => history.push("/"), 3000);
-          }
         })
         .catch(() => {
           alert("Register Failed!");
@@ -339,11 +338,22 @@ const Register = () => {
             <div className="mb-3 text-center">
               <p>
                 Already have an account?{" "}
-                <a href="/login" className="link-primary text-end">
+                <Link to="/login" className="link-primary text-end">
                   Login here
-                </a>
+                </Link>
               </p>
             </div>
+            {submitLoading && (
+              <div
+                className="alert alert-secondary mt-3 d-flex justify-content-center pt-3 pb-1"
+                role="alert"
+              >
+                <div className="spinner-border me-1" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+                <p>Submitting...</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
