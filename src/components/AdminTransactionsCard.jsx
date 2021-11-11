@@ -17,7 +17,7 @@ export const AdminTransactionsCard = (props) => {
 
   const fullDate = {
     date: transactionDate.getDate(),
-    month: transactionDate.getMonth() + 1,
+    month: transactionDate.getMonth(),
     year: transactionDate.getFullYear(),
   };
 

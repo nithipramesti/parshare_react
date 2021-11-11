@@ -24,7 +24,7 @@ export const AdminTransactionsDetails = (props) => {
   //Get date, month, year from transaction date
   const fullDate = {
     date: transactionDate.getDate(),
-    month: transactionDate.getMonth() + 1,
+    month: transactionDate.getMonth(),
     year: transactionDate.getFullYear(),
   };
 

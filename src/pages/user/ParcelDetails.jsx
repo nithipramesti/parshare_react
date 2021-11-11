@@ -377,13 +377,15 @@ function ParcelDetails(props) {
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  onClick={() =>
-                    setModalToggle({ displayed: true, products: {} })
-                  }
+                  onClick={() => setModalToggle(false)}
                 >
                   Close
                 </button>
-                <button type="button" className="btn btn-primary">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => addProduct(modalToggle.product.id_product)}
+                >
                   Add Product
                 </button>
               </div>
