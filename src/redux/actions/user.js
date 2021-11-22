@@ -63,7 +63,7 @@ export const KeepLoginAction = (dispatch, userLocalStorage, history) => {
     }
   )
     .then((res) => {
-      if (!res.data.errMessage) {
+      if (res.data.dataLogin) {
         //delete password user
         delete res.data.dataLogin.password;
 
@@ -75,18 +75,16 @@ export const KeepLoginAction = (dispatch, userLocalStorage, history) => {
           type: "USER_LOGIN",
           payload: res.data.dataLogin,
         });
-      } else {
-        //If token decoded failed / token expired
+      } else if (res.data.errMessage) {
+        //If  token decoding failed / token expired
         alert(res.data.errMessage);
-        if (res.data.tokenNotDecoded) {
-          localStorage.removeItem("token_parshare");
+        localStorage.removeItem("token_parshare");
 
-          dispatch({
-            type: "USER_LOGOUT",
-          });
+        dispatch({
+          type: "USER_LOGOUT",
+        });
 
-          history.push("/login");
-        }
+        history.push("/login");
       }
     })
     .catch((err) => console.log(err));

@@ -43,7 +43,11 @@ function ParcelDetails(props) {
     page: 1,
     maxPage: 0,
     itemPerPage: 9,
+    id_categoriesQuery: "",
+    id_categoriesQueryFiltered: "",
   });
+
+  const [currentPage, setCurrentPage] = useState(1);
 
   //State for saving filtered products data
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -53,6 +57,9 @@ function ParcelDetails(props) {
 
   //State for sorting
   const [sortBy, setSortBy] = useState("");
+
+  //State for search value
+  const [searchValue, setSearchValue] = useState("");
 
   //State for saving added products & quantity
   const [addedProducts, setAddedProducts] = useState([]);
@@ -69,15 +76,44 @@ function ParcelDetails(props) {
   //Function for pagination
   const paginationHandler = (direction) => {
     if (direction === "next") {
-      if (pagination.page < pagination.maxPage) {
-        setPagination({ ...pagination, page: pagination.page + 1 });
+      if (currentPage < pagination.maxPage) {
+        // setPagination({ ...pagination, page: pagination.page + 1 });
+        setCurrentPage(currentPage + 1);
       }
     } else if (direction === "previous") {
-      if (pagination.page > 0) {
-        setPagination({ ...pagination, page: pagination.page - 1 });
+      if (currentPage > 0) {
+        // setPagination({ ...pagination, page: pagination.page - 1 });
+        setCurrentPage(currentPage - 1);
       }
     }
   };
+
+  useEffect(() => {
+    let sortByQuery = "";
+    sortByQuery = sortBy ? `p.product_name ${sortBy}` : `p.id_product ASC`;
+
+    //Send request to backend
+    Axios.post(`${API_URL}/products/getPerPage/`, {
+      id_categoriesQuery: pagination.id_categoriesQueryFiltered,
+      startIndex: (currentPage - 1) * pagination.itemPerPage + 1,
+      itemPerPage: pagination.itemPerPage,
+      sortBy: sortByQuery,
+      searchValue: "",
+    })
+      .then((res) => {
+        console.log("Change current page");
+        console.log(res.data.products);
+
+        //Change products data in state
+        const ar = res.data.products;
+        setProducts([...ar]);
+        //Save products data to filter state
+        setFilteredProducts([...ar]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [currentPage]);
 
   //Render categories & quantity
   const renderCategories = () => {
@@ -218,7 +254,7 @@ function ParcelDetails(props) {
     }
   };
 
-  //Function to add parcel to CART
+  //Function to add parcel to CART.
   const addToCart = () => {
     //Get array of categories
     const categories = Object.keys(parcelData.categories);
@@ -401,17 +437,119 @@ function ParcelDetails(props) {
   };
 
   useEffect(() => {
-    let arr = products;
+    // let arr = products;
+    let id_categoriesQuery = pagination.id_categoriesQuery;
+    // console.log(pagination.id_categoriesQuery);
     if (filterCategory !== "All") {
-      arr = products.filter((val) => val.category === filterCategory);
-      console.log("arr", arr);
+      // arr = products.filter((val) => val.category === filterCategory);
+      // console.log("arr", arr)
+      id_categoriesQuery = [`c.category = "${filterCategory}"`];
     }
-    setFilteredProducts([...arr]);
 
-    const maxPage = Math.ceil(arr.length / pagination.itemPerPage);
-    setPagination({ ...pagination, maxPage, page: 1 });
-    console.log(maxPage);
+    let sortByQuery = "";
+    sortByQuery = sortBy ? `p.product_name ${sortBy}` : `p.id_product ASC`;
+
+    setCurrentPage(1);
+
+    //Send request to backend
+    Axios.post(`${API_URL}/products/getFilter/`, {
+      id_categoriesQuery: id_categoriesQuery,
+      startIndex: 0 * pagination.itemPerPage + 1,
+      itemPerPage: pagination.itemPerPage,
+      sortBy: sortByQuery,
+      searchValue,
+    })
+      .then((res) => {
+        console.log("change filter category");
+        console.log(res.data.products);
+
+        //Set max page -- depends on products number
+        const maxPage = Math.ceil(
+          res.data.totalProducts / pagination.itemPerPage
+        );
+        setPagination({
+          ...pagination,
+          maxPage,
+        });
+
+        //Change products data in state
+        const ar = res.data.products;
+        setProducts([...ar]);
+        //Save products data to filter state
+        setFilteredProducts([...ar]);
+
+        setPagination({
+          ...pagination,
+          id_categoriesQueryFiltered: id_categoriesQuery,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    // setFilteredProducts([...arr]);
+
+    // const maxPage = Math.ceil(arr.length / pagination.itemPerPage);
+    // setPagination({ ...pagination, maxPage });
+    // console.log(maxPage);
+
+    //Send request to backend
+    // Axios.post(`${API_URL}/products/getPerPage/`, {
+    //   id_categoriesQuery: pagination.id_categoriesQuery,
+    //   startIndex: (pagination.page - 1) * pagination.itemPerPage + 1,
+    //   itemPerPage: pagination.itemPerPage,
+    // })
+    //   .then((res) => {
+    //     console.log("MAAA");
+    //     console.log(res.data.products);
+
+    //     //Change products data in state
+    //     const ar = res.data.products;
+    //     setProducts([...ar]);
+    //     //Save products data to filter state
+    //     setFilteredProducts([...ar]);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
   }, [filterCategory]);
+
+  useEffect(() => {
+    console.log("filteredquery", pagination.id_categoriesQueryFiltered);
+    setCurrentPage(1);
+
+    let sortByQuery = "";
+    sortByQuery = sortBy ? `p.product_name ${sortBy}` : `p.id_product ASC`;
+
+    //Send request to backend
+    Axios.post(`${API_URL}/products/getFilter/`, {
+      id_categoriesQuery: pagination.id_categoriesQueryFiltered,
+      startIndex: 0 * pagination.itemPerPage + 1,
+      itemPerPage: pagination.itemPerPage,
+      sortBy: sortByQuery,
+      searchValue,
+    })
+      .then((res) => {
+        console.log("SORT");
+        console.log(res.data.products);
+        //Set max page -- depends on products number
+        const maxPage = Math.ceil(
+          res.data.totalProducts / pagination.itemPerPage
+        );
+        setPagination({
+          ...pagination,
+          maxPage,
+        });
+        //Change products data in state
+        const ar = res.data.products;
+        setProducts([...ar]);
+        //Save products data to filter state
+        setFilteredProducts([...ar]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [sortBy]);
 
   //Render categories filter
   const renderCategoriesFilter = () => {
@@ -430,46 +568,71 @@ function ParcelDetails(props) {
 
   //Function for search input handler
   const searchInputHandler = (event) => {
-    const searchResult = products.filter((val) => {
-      return val.product_name.toLowerCase().includes(event.target.value);
-    });
+    setSearchValue(event.target.value);
+  };
 
-    setFilteredProducts([...searchResult]);
+  const searchProducts = () => {
+    setCurrentPage(1);
+    // alert(searchValue);
+    Axios.post(`${API_URL}/products/getFilter/`, {
+      id_categoriesQuery: pagination.id_categoriesQuery,
+      startIndex: 0 * pagination.itemPerPage + 1,
+      itemPerPage: pagination.itemPerPage,
+      sortBy: `p.id_product ASC`,
+      searchValue,
+    })
+      .then((res) => {
+        console.log("SEARCH");
+        console.log(res.data.products);
+        //Set max page -- depends on products number
+        const maxPage = Math.ceil(
+          res.data.totalProducts / pagination.itemPerPage
+        );
+        setPagination({
+          ...pagination,
+          maxPage,
+        });
+        //Change products data in state
+        const ar = res.data.products;
+        setProducts([...ar]);
+        //Save products data to filter state
+        setFilteredProducts([...ar]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   //Render product cards
   const renderProductCards = () => {
-    const beginningIndex = (pagination.page - 1) * pagination.itemPerPage;
+    const beginningIndex = (currentPage - 1) * pagination.itemPerPage;
     let rawData = [...filteredProducts];
 
-    const compareString = (a, b) => {
-      if (a.product_name < b.product_name) {
-        return -1;
-      } else if (a.product_name > b.product_name) {
-        return 1;
-      } else {
-        return 0;
-      }
-    };
+    // const compareString = (a, b) => {
+    //   if (a.product_name < b.product_name) {
+    //     return -1;
+    //   } else if (a.product_name > b.product_name) {
+    //     return 1;
+    //   } else {
+    //     return 0;
+    //   }
+    // };
 
-    switch (sortBy) {
-      case "az":
-        rawData.sort(compareString);
-        break;
+    // switch (sortBy) {
+    //   case "az":
+    //     rawData.sort(compareString);
+    //     break;
 
-      case "za":
-        rawData.sort((a, b) => compareString(b, a));
-        break;
+    //   case "za":
+    //     rawData.sort((a, b) => compareString(b, a));
+    //     break;
 
-      default:
-        rawData = [...filteredProducts];
-        break;
-    }
+    //   default:
+    //     rawData = [...filteredProducts];
+    //     break;
+    // }
 
-    const currentData = rawData.slice(
-      beginningIndex,
-      beginningIndex + pagination.itemPerPage
-    );
+    const currentData = rawData;
 
     return currentData.map((product, index) => {
       return (
@@ -512,7 +675,11 @@ function ParcelDetails(props) {
   //Fetching product data
   useEffect(() => {
     //Send request to backend
-    Axios.get(`${API_URL}/products/get/${id_parcel}`)
+    Axios.post(`${API_URL}/products/get/${id_parcel}`, {
+      startIndex: (currentPage - 1) * pagination.itemPerPage + 1,
+      itemPerPage: pagination.itemPerPage,
+      sortBy: "p.id_product ASC",
+    })
       .then((res) => {
         if (!res.data.errMessage) {
           //Save categories & qty to state
@@ -529,11 +696,14 @@ function ParcelDetails(props) {
 
           //Set max page -- depends on products number
           const maxPage = Math.ceil(
-            res.data.products.length / pagination.itemPerPage
+            res.data.totalProducts / pagination.itemPerPage
           );
-          setPagination({ ...pagination, maxPage });
-
-          console.log("max page: ", maxPage);
+          setPagination({
+            ...pagination,
+            maxPage,
+            id_categoriesQuery: res.data.id_categoriesQuery,
+            id_categoriesQueryFiltered: res.data.id_categoriesQuery,
+          });
 
           setIsLoading(false);
         } else {
@@ -592,6 +762,7 @@ function ParcelDetails(props) {
                       placeholder="Search product"
                     />
                     <svg
+                      onClick={searchProducts}
                       xmlns="http://www.w3.org/2000/svg"
                       width="18"
                       height="18"
@@ -638,8 +809,8 @@ function ParcelDetails(props) {
                     <option value="" selected>
                       None
                     </option>
-                    <option value="az">A - Z</option>
-                    <option value="za">Z - A</option>
+                    <option value="ASC">A - Z</option>
+                    <option value="DESC">Z - A</option>
                   </select>
                 </div>
               </div>
@@ -652,9 +823,7 @@ function ParcelDetails(props) {
           >
             <ul className="pagination justify-content-end">
               <li
-                className={`page-item ${
-                  pagination.page === 1 ? `disabled` : ``
-                }`}
+                className={`page-item ${currentPage === 1 ? `disabled` : ``}`}
               >
                 <button
                   onClick={() => paginationHandler("previous")}
@@ -665,11 +834,11 @@ function ParcelDetails(props) {
                 </button>
               </li>
               <li className="page-item disabled" aria-current="page">
-                <button className="page-link">{`${pagination.page} / ${pagination.maxPage}`}</button>
+                <button className="page-link">{`${currentPage} / ${pagination.maxPage}`}</button>
               </li>
               <li
                 className={`page-item ${
-                  pagination.page === pagination.maxPage ? `disabled` : ``
+                  currentPage === pagination.maxPage ? `disabled` : ``
                 }`}
               >
                 <button
