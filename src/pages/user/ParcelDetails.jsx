@@ -61,6 +61,9 @@ function ParcelDetails(props) {
   //State for search value
   const [searchValue, setSearchValue] = useState("");
 
+  //State for fetching loading
+  const [isFetching, setIsFetching] = useState(false);
+
   //State for saving added products & quantity
   const [addedProducts, setAddedProducts] = useState([]);
 
@@ -436,6 +439,7 @@ function ParcelDetails(props) {
     setModalToggle({ displayed: true, product });
   };
 
+  //fetching data for filtering per category
   useEffect(() => {
     // let arr = products;
     let id_categoriesQuery = pagination.id_categoriesQuery;
@@ -460,6 +464,7 @@ function ParcelDetails(props) {
       searchValue,
     })
       .then((res) => {
+        setIsFetching(false);
         console.log("change filter category");
         console.log(res.data.products);
 
@@ -484,6 +489,7 @@ function ParcelDetails(props) {
         });
       })
       .catch((err) => {
+        setIsFetching(false);
         console.log(err);
       });
 
@@ -551,6 +557,13 @@ function ParcelDetails(props) {
       });
   }, [sortBy]);
 
+  //function for categories filter btn
+  const filteringCategory = (category) => {
+    setIsFetching(true);
+    setFilterCategory(category);
+    setSearchValue("");
+  };
+
   //Render categories filter
   const renderCategoriesFilter = () => {
     let categoriesFilter = ["All", ...Object.keys(parcelData.categories)];
@@ -560,7 +573,7 @@ function ParcelDetails(props) {
           className={`btn p-2 rounded-pill ${
             filterCategory === category ? `btn-primary` : `btn-outline-primary`
           } category-active px-3 me-1`}
-          onClick={() => setFilterCategory(category)}
+          onClick={() => filteringCategory(category)}
         >{`${category}`}</button>
       );
     });
@@ -572,6 +585,8 @@ function ParcelDetails(props) {
   };
 
   const searchProducts = () => {
+    setIsFetching(true);
+    setFilterCategory("All");
     setCurrentPage(1);
     // alert(searchValue);
     Axios.post(`${API_URL}/products/getFilter/`, {
@@ -597,6 +612,8 @@ function ParcelDetails(props) {
         setProducts([...ar]);
         //Save products data to filter state
         setFilteredProducts([...ar]);
+
+        setIsFetching(false);
       })
       .catch((err) => {
         console.log(err);
@@ -814,7 +831,19 @@ function ParcelDetails(props) {
                   </select>
                 </div>
               </div>
-              <div className="products-container">{renderProductCards()}</div>
+              <div className="products-container">
+                {!isFetching ? (
+                  renderProductCards()
+                ) : (
+                  <div className="spinner-container text-center">
+                    <div className="spinner-border" role="status">
+                      <span class="visually-hidden">
+                        Loading transactions data...
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <nav

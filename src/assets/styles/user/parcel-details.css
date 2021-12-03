@@ -22,7 +22,14 @@
 
 .search-icon {
   position: absolute;
-  right: 10px;
+  right: 5px;
+  cursor: pointer;
+  color: #ffffff;
+  background-color: #041e43;
+  padding: 6px;
+  border-radius: 5px;
+  width: 28px;
+  height: 28px;
 }
 
 .products-container {
@@ -133,6 +140,10 @@
 .alert-msg {
   width: fit-content;
   margin: 0 auto;
+}
+
+.products-container .spinner-container {
+  grid-column: span 3;
 }
 
 /* BOOTSTRAP */
