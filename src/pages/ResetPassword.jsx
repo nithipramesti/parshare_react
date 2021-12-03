@@ -280,13 +280,22 @@ function ResetPassword(props) {
               </div>
 
               <div className="mb-4 container-fluid p-0"></div>
-              <input
-                type="submit"
-                value="Reset Password"
-                className="btn btn-primary py-2 container-fluid mb-3"
-              />
+              {!submitLoading ? (
+                <input
+                  type="submit"
+                  value="Reset Password"
+                  className="btn btn-primary py-2 container-fluid mb-3"
+                />
+              ) : (
+                <input
+                  type="submit"
+                  value="Submitting..."
+                  className="btn btn-primary py-2 container-fluid mb-3"
+                  disabled
+                />
+              )}
             </form>
-            {submitLoading && (
+            {/* {submitLoading && (
               <div
                 className="alert alert-secondary mt-3 d-flex justify-content-center pt-3 pb-1"
                 role="alert"
@@ -296,7 +305,7 @@ function ResetPassword(props) {
                 </div>
                 <p>Submitting...</p>
               </div>
-            )}
+            )} */}
           </>
         ) : (
           <>

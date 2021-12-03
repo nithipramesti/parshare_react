@@ -185,11 +185,20 @@ function Login() {
                   </Link>
                 </div>
                 <div className="mb-4 container-fluid p-0"></div>
-                <input
-                  type="submit"
-                  value="Login"
-                  className="btn btn-primary py-2 container-fluid mb-3"
-                />
+                {!submitLoading ? (
+                  <input
+                    type="submit"
+                    value="Login"
+                    className="btn btn-primary py-2 container-fluid mb-3"
+                  />
+                ) : (
+                  <input
+                    type="submit"
+                    value="Submitting..."
+                    className="btn btn-primary py-2 container-fluid mb-3"
+                    disabled
+                  />
+                )}
               </form>
 
               <div className="mb-3 text-center">
@@ -199,7 +208,7 @@ function Login() {
                     Register here
                   </Link>
                 </p>
-                {submitLoading && (
+                {/* {submitLoading && (
                   <div
                     className="alert alert-secondary mt-3 d-flex justify-content-center pt-3 pb-1"
                     role="alert"
@@ -209,7 +218,7 @@ function Login() {
                     </div>
                     <p>Submitting...</p>
                   </div>
-                )}
+                )} */}
               </div>
             </div>
           </div>

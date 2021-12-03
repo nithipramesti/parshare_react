@@ -114,13 +114,22 @@ function ForgotPassword() {
           </div>
 
           <div className="mb-4 container-fluid p-0"></div>
-          <input
-            type="submit"
-            value="Send"
-            className="btn btn-primary btn-send py-2 container-fluid mb-3"
-          />
+          {!submitLoading ? (
+            <input
+              type="submit"
+              value="Send"
+              className="btn btn-primary btn-send py-2 container-fluid mb-3"
+            />
+          ) : (
+            <input
+              type="submit"
+              value="Submitting..."
+              className="btn btn-primary btn-send py-2 container-fluid mb-3"
+              disabled
+            />
+          )}
         </form>
-        {submitLoading && (
+        {/* {submitLoading && (
           <div
             className="alert alert-secondary mt-3 d-flex justify-content-center pt-3 pb-1"
             role="alert"
@@ -130,7 +139,7 @@ function ForgotPassword() {
             </div>
             <p>Submitting...</p>
           </div>
-        )}
+        )} */}
         {resMessage.success && (
           <div className="alert alert-success mt-3" role="alert">
             {resMessage.success}

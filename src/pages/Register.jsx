@@ -326,14 +326,26 @@ const Register = () => {
                 </div>
               </div>
               <div className="mt-4 mb-2 container-fluid p-0">
-                <button
-                  onClick={registerHandler}
-                  type="button"
-                  className="btn btn-primary container-fluid"
-                  id="registerBtn"
-                >
-                  Register
-                </button>
+                {!submitLoading ? (
+                  <button
+                    onClick={registerHandler}
+                    type="button"
+                    className="btn btn-primary container-fluid"
+                    id="registerBtn"
+                  >
+                    Register
+                  </button>
+                ) : (
+                  <button
+                    onClick={registerHandler}
+                    type="button"
+                    className="btn btn-primary container-fluid"
+                    id="registerBtn"
+                    disabled
+                  >
+                    Submitting...
+                  </button>
+                )}
               </div>
             </form>
             <div className="mb-3 text-center">
@@ -344,7 +356,7 @@ const Register = () => {
                 </Link>
               </p>
             </div>
-            {submitLoading && (
+            {/* {submitLoading && (
               <div
                 className="alert alert-secondary mt-3 d-flex justify-content-center pt-3 pb-1"
                 role="alert"
@@ -354,7 +366,7 @@ const Register = () => {
                 </div>
                 <p>Submitting...</p>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>
