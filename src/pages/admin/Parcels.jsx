@@ -1,455 +1,469 @@
-import React, { useState, useEffect } from 'react';
-import { Redirect } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Redirect } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import Axios from 'axios';
-import { API_URL } from '../../data/API';
-import { DataGrid } from '@mui/x-data-grid';
-import { Modal, Alert } from 'react-bootstrap';
+import Axios from "axios";
+import { API_URL } from "../../data/API";
+import { DataGrid } from "@mui/x-data-grid";
+import { Modal, Alert } from "react-bootstrap";
 
-function Parcels(){
+function Parcels() {
   const authReducer = useSelector((state) => state.authReducer);
 
-  const [ parcelList, setParcelList ] = useState([])
-  const [ selectCategory, setSelectCategory ] = useState([]);
-  const [ selectEditCategory, setSelectEditCategory ] = useState([]);
-  const [ avgPriceProductCategory, setAvgPriceProductCategory] = useState([]);
-  const [ showAlert, setShowAlert ] = useState({});
-  const [ showAddParcel, setShowAddParcel ] = useState(false);
-  const [ inputImage, setInputImage ] = useState({});
-  const [ inputParcel, setInputParcel ] = useState({});
-  const [ categoryList, setCategoryList ] = useState([]);
-  const [ showEditParcelModal, setshowEditParcelModal ] = useState(false);
-  const [ editParcel, setEditParcel ] = useState({});
-  const [ editImage, setEditImage ] = useState({});
-
+  const [parcelList, setParcelList] = useState([]);
+  const [selectCategory, setSelectCategory] = useState([]);
+  const [selectEditCategory, setSelectEditCategory] = useState([]);
+  const [avgPriceProductCategory, setAvgPriceProductCategory] = useState([]);
+  const [showAlert, setShowAlert] = useState({});
+  const [showAddParcel, setShowAddParcel] = useState(false);
+  const [inputImage, setInputImage] = useState({});
+  const [inputParcel, setInputParcel] = useState({});
+  const [categoryList, setCategoryList] = useState([]);
+  const [showEditParcelModal, setshowEditParcelModal] = useState(false);
+  const [editParcel, setEditParcel] = useState({});
+  const [editImage, setEditImage] = useState({});
 
   const fetchCategory = () => {
     Axios.get(`${API_URL}/categories/list`)
-    .then(res => {
-      setCategoryList( res.data.data )
-    })
-    .catch(err => {
-    })
-  }
+      .then((res) => {
+        setCategoryList(res.data.data);
+      })
+      .catch((err) => {});
+  };
 
   const fetchAveragePriceProductCategory = () => {
     Axios.get(`${API_URL}/categories/average`)
-    .then(res => {
-      setAvgPriceProductCategory( res.data.data )
-    })
-    .catch(err => {
-    })
-  }
+      .then((res) => {
+        setAvgPriceProductCategory(res.data.data);
+      })
+      .catch((err) => {});
+  };
 
   const fetchParcel = () => {
     Axios.get(`${API_URL}/parcels/list`)
-    .then(res => {
-      setParcelList(res.data.data)
-    })
-    .catch(err => {
-    })
-  }
+      .then((res) => {
+        setParcelList(res.data.data);
+      })
+      .catch((err) => {});
+  };
 
   useEffect(() => {
     fetchParcel();
     fetchCategory();
     fetchAveragePriceProductCategory();
-  }, [])
+  }, []);
 
   const handleSelectCategory = (e, index) => {
     const value = e.target.value;
     const name = e.target.name;
-    setSelectCategory( 
-      selectCategory.map((res,i) => {
-        if(i === index){
+    setSelectCategory(
+      selectCategory.map((res, i) => {
+        if (i === index) {
           return {
             ...res,
-            [name]: value
-          }
-        }else{
-          return{
-            ...res
-          }
+            [name]: value,
+          };
+        } else {
+          return {
+            ...res,
+          };
         }
       })
-    )
-  }
+    );
+  };
   const handleAddCategory = () => {
-    setSelectCategory(
-      [
-        ...selectCategory,
-        {
-          category: "",
-          quantity : ""
-        }
-      ]
-    )
-  }
+    setSelectCategory([
+      ...selectCategory,
+      {
+        category: "",
+        quantity: "",
+      },
+    ]);
+  };
   const handleDeleteCategory = (index) => {
     setSelectCategory(
-      selectCategory.filter((res,i) => {
-        if(i !== index) return res
+      selectCategory.filter((res, i) => {
+        if (i !== index) return res;
       })
-    )
-    console.log(selectCategory)
-  }
+    );
+    console.log(selectCategory);
+  };
 
   const addInputHandler = (e) => {
     const value = e.target.value;
     const name = e.target.name;
     setInputParcel({ ...inputParcel, [name]: value });
-  }
+  };
   const inputImageHandler = (e) => {
-    if(e.target.files[0]){
-      setInputImage({ ...inputParcel, imageName: e.target.files[0].name, image: e.target.files[0] });
-      let preview = document.getElementById("preview")
+    if (e.target.files[0]) {
+      setInputImage({
+        ...inputParcel,
+        imageName: e.target.files[0].name,
+        image: e.target.files[0],
+      });
+      let preview = document.getElementById("preview");
       preview.src = URL.createObjectURL(e.target.files[0]);
     }
-  }
+  };
 
   const editImageHandler = (e) => {
-    if(e.target.files[0]){
-      setEditImage({ ...editParcel, imageName: e.target.files[0].name, image: e.target.files[0] });
-      let preview = document.getElementById("edit_preview")
+    if (e.target.files[0]) {
+      setEditImage({
+        ...editParcel,
+        imageName: e.target.files[0].name,
+        image: e.target.files[0],
+      });
+      let preview = document.getElementById("edit_preview");
       preview.src = URL.createObjectURL(e.target.files[0]);
     }
-  }
+  };
 
   const editParcelHandler = (e) => {
     const value = e.target.value;
     const name = e.target.name;
     setEditParcel({ ...editParcel, [name]: value });
-  }
+  };
 
   const totalCapitalParcel = () => {
-    let totalModal = 0
+    let totalModal = 0;
     // console.log(`selectCategory length :`, selectCategory.length)
     // console.log(`avgPriceProductCategory : `, avgPriceProductCategory)
     // console.log(`avgPriceProductCategory length : `,avgPriceProductCategory.length)
-    for(let i=0;i<selectCategory.length;i++){
+    for (let i = 0; i < selectCategory.length; i++) {
       // console.log(`perulangan i ke ${i}`)
-      if(selectCategory[i].category===""){
-        selectCategory[i].category = 1
-      }else{
-        selectCategory[i].category = parseInt(selectCategory[i].category)
+      if (selectCategory[i].category === "") {
+        selectCategory[i].category = 1;
+      } else {
+        selectCategory[i].category = parseInt(selectCategory[i].category);
       }
-      let id_category_selected = selectCategory[i].category
-      let category_quantity_selected = parseInt(selectCategory[i].quantity)
+      let id_category_selected = selectCategory[i].category;
+      let category_quantity_selected = parseInt(selectCategory[i].quantity);
       // console.log(`id_category_selected : `,id_category_selected)
-      for(let j=0;j<avgPriceProductCategory.length;j++){
+      for (let j = 0; j < avgPriceProductCategory.length; j++) {
         // console.log(`perulangan j ke ${j}`)
-        if(id_category_selected === avgPriceProductCategory[j].id_category){
+        if (id_category_selected === avgPriceProductCategory[j].id_category) {
           // console.log(`avgPriceProductCategory : `,avgPriceProductCategory[j].average_price)
           // console.log(`selectCategory quantity : `, category_quantity_selected)
-          totalModal = totalModal + (avgPriceProductCategory[j].average_price * category_quantity_selected)
+          totalModal =
+            totalModal +
+            avgPriceProductCategory[j].average_price *
+              category_quantity_selected;
         }
       }
     }
     // console.log(`totalModal : `, totalModal)
-    return Math.floor(totalModal)
-  }
+    return Math.floor(totalModal);
+  };
 
   const submitAddParcelHandler = () => {
-    if(inputImage.image && inputParcel.name && inputParcel.margin && inputParcel.description ){
-      let price = totalCapitalParcel() + parseInt(inputParcel.margin)
-      console.log(price)
+    if (
+      inputImage.image &&
+      inputParcel.name &&
+      inputParcel.margin &&
+      inputParcel.description
+    ) {
+      let price =
+        Math.floor(
+          (totalCapitalParcel() + parseInt(inputParcel.margin)) / 1000
+        ) * 1000;
+      console.log(price);
       let formData = new FormData();
       let obj = {
         category: selectCategory,
         price,
-        ...inputParcel
-      }
+        ...inputParcel,
+      };
 
-      console.log(`objectAdd:${JSON.stringify(obj)}`)
+      console.log(`objectAdd:${JSON.stringify(obj)}`);
 
-      formData.append('data', JSON.stringify(obj));
-      formData.append('file', inputImage.image)
+      formData.append("data", JSON.stringify(obj));
+      formData.append("file", inputImage.image);
       Axios.post(`${API_URL}/parcels/add`, formData, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem("token_parshare")}`
-        }
+          Authorization: `Bearer ${localStorage.getItem("token_parshare")}`,
+        },
       })
-      .then(res => {
-        fetchParcel();
-        setShowAlert({
-          show: true,
-          type: "success",
-          message: "Add parcel succeed"
-        })
-      })
-      .catch(err => {
-        err.response.status === 401 ?
-          window.location.replace("/login")
-        :
+        .then((res) => {
+          fetchParcel();
           setShowAlert({
             show: true,
-            type: "danger",
-            message: err.response.data.data
-          })
-      });
-    }else{
+            type: "success",
+            message: "Add parcel succeed",
+          });
+        })
+        .catch((err) => {
+          err.response.status === 401
+            ? window.location.replace("/login")
+            : setShowAlert({
+                show: true,
+                type: "danger",
+                message: err.response.data.data,
+              });
+        });
+    } else {
       setShowAlert({
         show: true,
         type: "warning",
-        message: "Please fill out all the form!"
-      })
+        message: "Please fill out all the form!",
+      });
     }
-  }
+  };
 
   const submitEditParcelHandler = () => {
-    console.log(`editParcel :`, editParcel)
-    if(editParcel.id && editParcel.image && editParcel.name && editParcel.margin && editParcel.description ){
-      let price = totalCapitalParcel() + parseInt(editParcel.margin)
-      console.log(price)
+    console.log(`editParcel :`, editParcel);
+    if (
+      editParcel.id &&
+      editParcel.image &&
+      editParcel.name &&
+      editParcel.margin &&
+      editParcel.description
+    ) {
+      let price =
+        Math.floor(
+          (totalCapitalParcel() + parseInt(editParcel.margin)) / 1000
+        ) * 1000;
+      console.log(price);
       let formData = new FormData();
       let obj = {
         category: selectCategory,
         price,
-        ...editParcel
-      }
+        ...editParcel,
+      };
 
-      console.log(`object:${JSON.stringify(obj)}`)
+      console.log(`object:${JSON.stringify(obj)}`);
 
-      formData.append('data', JSON.stringify(obj));
-      formData.append('file', editImage.image)
+      formData.append("data", JSON.stringify(obj));
+      formData.append("file", editImage.image);
       Axios.patch(`${API_URL}/parcels/edit`, formData, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem("token_parshare")}`
-        }
+          Authorization: `Bearer ${localStorage.getItem("token_parshare")}`,
+        },
       })
-      .then(res => {
-        fetchParcel();
-        setShowAlert({
-          show: true,
-          type: "success",
-          message: "Edit parcel succeed"
-        })
-      })
-      .catch(err => {
-        err.response.status === 401 ?
-          window.location.replace("/login")
-        :
+        .then((res) => {
+          fetchParcel();
           setShowAlert({
             show: true,
-            type: "danger",
-            message: err.response.data.data
-          })
-      });
-    }else{
+            type: "success",
+            message: "Edit parcel succeed",
+          });
+        })
+        .catch((err) => {
+          err.response.status === 401
+            ? window.location.replace("/login")
+            : setShowAlert({
+                show: true,
+                type: "danger",
+                message: err.response.data.data,
+              });
+        });
+    } else {
       setShowAlert({
         show: true,
         type: "warning",
-        message: "Please fill out all the form!"
-      })
+        message: "Please fill out all the form!",
+      });
     }
-  }
+  };
 
   const deleteParcelHandler = (id) => {
-    console.log(editParcel)
-    console.log(`id:${id}`)
-    if(id){
+    console.log(editParcel);
+    console.log(`id:${id}`);
+    if (id) {
       Axios.delete(`${API_URL}/parcels/delete?id=${id}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem("token_parshare")}`
-        }
+          Authorization: `Bearer ${localStorage.getItem("token_parshare")}`,
+        },
       })
-      .then(res => {
-        fetchParcel()
-        setShowAlert({
-          show: true,
-          type: "success",
-          message: "Delete parcel succeed"
-        })
-      })
-      .catch(err => {
-        err.response.status === 401 ?
-          window.location.replace("/login")
-        :
+        .then((res) => {
+          fetchParcel();
           setShowAlert({
             show: true,
-            type: "danger",
-            message: err.response.data.data
-          })
-      })
+            type: "success",
+            message: "Delete parcel succeed",
+          });
+        })
+        .catch((err) => {
+          err.response.status === 401
+            ? window.location.replace("/login")
+            : setShowAlert({
+                show: true,
+                type: "danger",
+                message: err.response.data.data,
+              });
+        });
     }
-  }
-  
-
+  };
 
   const handleShowAddParcel = () => {
-    setShowAddParcel(true)
-  }
+    setShowAddParcel(true);
+  };
 
   const handleShowEditParcelModal = (id) => {
     setShowAlert({
-      show: false
-    })
+      show: false,
+    });
     parcelList.map((parcel) => {
-      if(parcel.id_parcel === id){
+      if (parcel.id_parcel === id) {
         setEditParcel({
           id: parcel.id,
           name: parcel.parcel_name,
           image: parcel.image_parcel,
           margin: parcel.margin,
-          description: parcel.description
-        })
+          description: parcel.description,
+        });
       }
-    })
-    setshowEditParcelModal(true)
-  }
+    });
+    setshowEditParcelModal(true);
+  };
 
   const handleCloseAddParcel = () => {
-    setEditImage({})
+    setEditImage({});
     setShowAlert({
-      show: false
-    })
-    setShowAddParcel(false)
-    setSelectCategory(
-      []
-    )
-    setShowAddParcel(false)
+      show: false,
+    });
+    setShowAddParcel(false);
+    setSelectCategory([]);
+    setShowAddParcel(false);
   };
 
   const handleCloseEditParcel = () => {
-    setInputImage({})
+    setInputImage({});
     setShowAlert({
-      show: false
-    })
-    setEditParcel({})
-    setSelectEditCategory(
-      []
-    )
-    setshowEditParcelModal(false)
+      show: false,
+    });
+    setEditParcel({});
+    setSelectEditCategory([]);
+    setshowEditParcelModal(false);
   };
 
   const renderGrid = () => {
-    console.log(`parcelList`,parcelList)
+    console.log(`parcelList`, parcelList);
     const columns = [
       {
-        field: 'id',
-        headerName: '#',
-        type: 'number',
+        field: "id",
+        headerName: "#",
+        type: "number",
         numeric: true,
-        headerAlign: 'center',
+        headerAlign: "center",
         sortable: true,
         width: 50,
       },
       {
-        field: 'image_parcel',
-        headerName: ' ',
-        headerAlign: 'center',
+        field: "image_parcel",
+        headerName: " ",
+        headerAlign: "center",
         width: 65,
         sortable: false,
         filterable: false,
         renderCell: (params) => (
           <img src={`${API_URL}/${params.value}`} height="50px"></img>
-        )
+        ),
       },
       {
-        field: 'parcel_name',
-        headerName: 'Name',
-        headerAlign: 'center',
+        field: "parcel_name",
+        headerName: "Name",
+        headerAlign: "center",
         width: 200,
       },
       {
-        field: 'description',
-        headerName: 'Description',
-        headerAlign: 'center',
+        field: "description",
+        headerName: "Description",
+        headerAlign: "center",
         width: 200,
-      }, 
+      },
       {
-        field: 'categoryQuantity',
-        headerName: 'Category',
-        headerAlign: 'center',
+        field: "categoryQuantity",
+        headerName: "Category",
+        headerAlign: "center",
         width: 300,
         sortable: false,
         renderCell: (params) => (
           <>
-            {
-              ((params.value[0]).split(",")).map((cat, qty) => {
-                return <span class="badge alert-primary" style={{marginRight:"5px"}}>{(params.value[1]).split(",")[qty]} {cat}</span>
-              })
-            }
+            {params.value[0].split(",").map((cat, qty) => {
+              return (
+                <span
+                  class="badge alert-primary"
+                  style={{ marginRight: "5px" }}
+                >
+                  {params.value[1].split(",")[qty]} {cat}
+                </span>
+              );
+            })}
           </>
-        )
+        ),
       },
       {
-        field: 'parcel_price',
-        headerName: 'Price',
-        headerAlign: 'center',
+        field: "parcel_price",
+        headerName: "Price",
+        headerAlign: "center",
+        width: 150,
+        renderCell: (params) => <>Rp {params.value.toLocaleString()}</>,
+      },
+      {
+        field: "margin",
+        headerName: "Profit",
+        headerAlign: "center",
+        width: 150,
+        renderCell: (params) => <>Rp {params.value.toLocaleString()}</>,
+      },
+      {
+        field: "active",
+        headerName: "Status",
+        headerAlign: "center",
         width: 150,
         renderCell: (params) => (
           <>
-          Rp {params.value.toLocaleString()}
-          </>
-        )
-      },
-      {
-        field: 'margin',
-        headerName: 'Profit',
-        headerAlign: 'center',
-        width: 150,
-        renderCell: (params) => (
-          <>
-          Rp {params.value.toLocaleString()}
-          </>
-        )
-      },
-      {
-        field: 'active',
-        headerName: 'Status',
-        headerAlign: 'center',
-        width: 150,
-        renderCell: (params) => (
-          <>
-          {
-            params.value === "true" ?
+            {params.value === "true" ? (
               <span class="badge alert-success">Active</span>
-            : <span class="badge alert-danger">Deleted</span>
-          }
+            ) : (
+              <span class="badge alert-danger">Deleted</span>
+            )}
           </>
-        )
+        ),
       },
       {
-        field: 'id_parcel',
-        headerName: 'Action',
-        headerAlign: 'center',
+        field: "id_parcel",
+        headerName: "Action",
+        headerAlign: "center",
         width: 150,
         sortable: false,
         filterable: false,
         renderCell: (params) => (
-          <button onClick={() => handleShowEditParcelModal(params.value)} class="btn btn-primary" style={{marginRight: "10px"}}>Edit</button>
-        )
-      }
+          <button
+            onClick={() => handleShowEditParcelModal(params.value)}
+            class="btn btn-primary"
+            style={{ marginRight: "10px" }}
+          >
+            Edit
+          </button>
+        ),
+      },
     ];
 
-    return <DataGrid
-      rows={parcelList} 
-      columns={columns} 
-      autoHeight
-      hideFooterSelectedRowCount
-      style={{marginTop: "15px"}}
-    />
-  }
+    return (
+      <DataGrid
+        rows={parcelList}
+        columns={columns}
+        autoHeight
+        hideFooterSelectedRowCount
+        style={{ marginTop: "15px" }}
+      />
+    );
+  };
 
-  if(authReducer.role !== "admin"){
-    return <Redirect to="/login"/>
-  }else{
-    return(
+  if (authReducer.role !== "admin") {
+    return <Redirect to="/login" />;
+  } else {
+    return (
       <div className="container container-top">
         <div className="row">
           <div className="col-md-6">
             <h1>Parcel</h1>
           </div>
           <div className="col-md-6">
-            <button 
-            className="btn btn-primary btn-right" 
-            onClick={handleShowAddParcel}
-            disabled={
-              categoryList.length > 0 ?
-                false
-              : true
-            }
+            <button
+              className="btn btn-primary btn-right"
+              onClick={handleShowAddParcel}
+              disabled={categoryList.length > 0 ? false : true}
             >
               Add Parcel
             </button>
@@ -462,19 +476,23 @@ function Parcels(){
             <Modal.Title>Add Parcel</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {
-              showAlert.show ?
-                <Alert variant={showAlert.type}>
-                  {showAlert.message}
-                </Alert>
-              : null
-            }
-            <div className="container" style={
-              inputImage.image ?
-                {display: 'block'}
-              : {display: 'none'}
-            }>
-              <img id="preview" style={{display: "inline-block", height: "140px", width: "140px"}} ></img>
+            {showAlert.show ? (
+              <Alert variant={showAlert.type}>{showAlert.message}</Alert>
+            ) : null}
+            <div
+              className="container"
+              style={
+                inputImage.image ? { display: "block" } : { display: "none" }
+              }
+            >
+              <img
+                id="preview"
+                style={{
+                  display: "inline-block",
+                  height: "140px",
+                  width: "140px",
+                }}
+              ></img>
             </div>
             <label htmlFor="form-email" className="form-label">
               Image
@@ -521,48 +539,61 @@ function Parcels(){
                 </label>
               </div>
             </div>
-            {
-              selectCategory.map((res, index) => {
-                return(
-                  <div className="row mb-2">
-                    <div className="col-md-8">
-                      <select class="form-select md-9" aria-label="Default select example" name="category" onChange={(e) => handleSelectCategory(e, index)}>
-                        {
-                          categoryList.map(category => {
-                            return(
-                                category.id_category === parseInt(res.category) ?
-                                <option value={category.id_category} selected>{category.category}</option>
-                              : 
-                              <option value={category.id_category}>{category.category}</option>
-                            )
-                          })
-                        }
-                      </select>
-                    </div>
-                    <div className="col-md-2">
-                      <input 
-                        type="number"
-                        min="1"
-                        class="form-control md-3"
-                        name="quantity"
-                        onChange={(e) => handleSelectCategory(e, index)}
-                        value={selectCategory[index].quantity}
-                        required
-                      />
-                    </div>
-                    <div class="col-md-2">
-                      <button 
-                        type="button" 
-                        class="btn btn-danger"
-                        onClick={() => handleDeleteCategory(index)}
-                      >✖️</button>
-                    </div>
+            {selectCategory.map((res, index) => {
+              return (
+                <div className="row mb-2">
+                  <div className="col-md-8">
+                    <select
+                      class="form-select md-9"
+                      aria-label="Default select example"
+                      name="category"
+                      onChange={(e) => handleSelectCategory(e, index)}
+                    >
+                      {categoryList.map((category) => {
+                        return category.id_category ===
+                          parseInt(res.category) ? (
+                          <option value={category.id_category} selected>
+                            {category.category}
+                          </option>
+                        ) : (
+                          <option value={category.id_category}>
+                            {category.category}
+                          </option>
+                        );
+                      })}
+                    </select>
                   </div>
-                )
-              })
-            }
+                  <div className="col-md-2">
+                    <input
+                      type="number"
+                      min="1"
+                      class="form-control md-3"
+                      name="quantity"
+                      onChange={(e) => handleSelectCategory(e, index)}
+                      value={selectCategory[index].quantity}
+                      required
+                    />
+                  </div>
+                  <div class="col-md-2">
+                    <button
+                      type="button"
+                      class="btn btn-danger"
+                      onClick={() => handleDeleteCategory(index)}
+                    >
+                      ✖️
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
             <div className="mb-2">
-              <button type="button" className="btn btn-primary" onClick={handleAddCategory}>Add Category</button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleAddCategory}
+              >
+                Add Category
+              </button>
             </div>
             <div className="row">
               <div className="col-md-8">
@@ -582,25 +613,36 @@ function Parcels(){
               </div>
               <div className="col-md-4">
                 <label htmlFor="form-email" className="form-label">
-                    Capital
-                  </label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    placeholder="0"
-                    name="margin"
-                    onChange={addInputHandler}
-                    value={totalCapitalParcel()}
-                    disabled
-                  />
+                  Capital
+                </label>
+                <input
+                  type="number"
+                  className="form-control"
+                  placeholder="0"
+                  name="margin"
+                  onChange={addInputHandler}
+                  value={totalCapitalParcel()}
+                  disabled
+                />
               </div>
             </div>
             <div className="row">
               <div className="col-md-6">
-                <button type="button" onClick={submitAddParcelHandler} className="btn btn-success w-100 mt-3">Add</button>
+                <button
+                  type="button"
+                  onClick={submitAddParcelHandler}
+                  className="btn btn-success w-100 mt-3"
+                >
+                  Add
+                </button>
               </div>
               <div className="col-md-6">
-                <button onClick={handleCloseAddParcel} className="btn btn-secondary w-100 mt-3">Close</button>
+                <button
+                  onClick={handleCloseAddParcel}
+                  className="btn btn-secondary w-100 mt-3"
+                >
+                  Close
+                </button>
               </div>
             </div>
           </Modal.Body>
@@ -611,15 +653,19 @@ function Parcels(){
             <Modal.Title>Edit Parcel</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {
-              showAlert.show ?
-                <Alert variant={showAlert.type}>
-                  {showAlert.message}
-                </Alert>
-              : null
-            }
+            {showAlert.show ? (
+              <Alert variant={showAlert.type}>{showAlert.message}</Alert>
+            ) : null}
             <div className="container">
-              <img src={`${API_URL}/${editParcel.image}`} id="edit_preview" style={{display: "inline-block", height: "140px", width: "140px"}}></img>
+              <img
+                src={`${API_URL}/${editParcel.image}`}
+                id="edit_preview"
+                style={{
+                  display: "inline-block",
+                  height: "140px",
+                  width: "140px",
+                }}
+              ></img>
               {/* <img id="edit_preview" width="150px" style={
               editImage.image ?
                 {display: 'inline-block'}
@@ -671,47 +717,61 @@ function Parcels(){
                 </label>
               </div>
             </div>
-            {
-              selectCategory.map((res, index) => {
-                return(
-                  <div className="row mb-2">
-                    <div className="col-md-8">
-                      <select class="form-select md-9" aria-label="Default select example" name="category" onChange={(e) => handleSelectCategory(e, index)}>
-                        {
-                          categoryList.map(category => {
-                            return(
-                                category.id_category === parseInt(res.category) ?
-                                <option value={category.id_category} selected>{category.category}</option>
-                              : <option value={category.id_category}>{category.category}</option>
-                            )
-                          })
-                        }
-                      </select>
-                    </div>
-                    <div className="col-md-2">
-                      <input 
-                        type="number"
-                        min="1"
-                        class="form-control md-3"
-                        name="quantity"
-                        onChange={(e) => handleSelectCategory(e, index)}
-                        value={selectCategory[index].quantity}
-                        required
-                      />
-                    </div>
-                    <div class="col-md-2">
-                      <button 
-                        type="button" 
-                        class="btn btn-danger"
-                        onClick={() => handleDeleteCategory(index)}
-                      >✖️</button>
-                    </div>
+            {selectCategory.map((res, index) => {
+              return (
+                <div className="row mb-2">
+                  <div className="col-md-8">
+                    <select
+                      class="form-select md-9"
+                      aria-label="Default select example"
+                      name="category"
+                      onChange={(e) => handleSelectCategory(e, index)}
+                    >
+                      {categoryList.map((category) => {
+                        return category.id_category ===
+                          parseInt(res.category) ? (
+                          <option value={category.id_category} selected>
+                            {category.category}
+                          </option>
+                        ) : (
+                          <option value={category.id_category}>
+                            {category.category}
+                          </option>
+                        );
+                      })}
+                    </select>
                   </div>
-                )
-              })
-            }
+                  <div className="col-md-2">
+                    <input
+                      type="number"
+                      min="1"
+                      class="form-control md-3"
+                      name="quantity"
+                      onChange={(e) => handleSelectCategory(e, index)}
+                      value={selectCategory[index].quantity}
+                      required
+                    />
+                  </div>
+                  <div class="col-md-2">
+                    <button
+                      type="button"
+                      class="btn btn-danger"
+                      onClick={() => handleDeleteCategory(index)}
+                    >
+                      ✖️
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
             <div className="mb-2">
-              <button type="button" className="btn btn-primary" onClick={handleAddCategory}>Add Category</button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleAddCategory}
+              >
+                Add Category
+              </button>
             </div>
 
             <div className="row">
@@ -732,35 +792,52 @@ function Parcels(){
               </div>
               <div className="col-md-4">
                 <label htmlFor="form-email" className="form-label">
-                    Capital
-                  </label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    placeholder= "0"
-                    name="margin"
-                    onChange={editParcelHandler}
-                    value={totalCapitalParcel()}
-                    disabled
-                  />
+                  Capital
+                </label>
+                <input
+                  type="number"
+                  className="form-control"
+                  placeholder="0"
+                  name="margin"
+                  onChange={editParcelHandler}
+                  value={totalCapitalParcel()}
+                  disabled
+                />
               </div>
             </div>
 
             <div className="row">
               <div className="col-md-4">
-                <button type="button" onClick={submitEditParcelHandler} className="btn btn-success w-100 mt-3">Edit</button>
+                <button
+                  type="button"
+                  onClick={submitEditParcelHandler}
+                  className="btn btn-success w-100 mt-3"
+                >
+                  Edit
+                </button>
               </div>
               <div className="col-md-4">
-                <button type="button" onClick={() => deleteParcelHandler(editParcel.id)} className="btn btn-danger w-100 mt-3">Delete</button>
+                <button
+                  type="button"
+                  onClick={() => deleteParcelHandler(editParcel.id)}
+                  className="btn btn-danger w-100 mt-3"
+                >
+                  Delete
+                </button>
               </div>
               <div className="col-md-4">
-                <button onClick={handleCloseEditParcel} className="btn btn-secondary w-100 mt-3">Close</button>
+                <button
+                  onClick={handleCloseEditParcel}
+                  className="btn btn-secondary w-100 mt-3"
+                >
+                  Close
+                </button>
               </div>
             </div>
           </Modal.Body>
         </Modal>
       </div>
-    )
+    );
   }
 }
 

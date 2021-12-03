@@ -130,6 +130,7 @@ const Register = () => {
             username: "",
             password: "",
             confirmPassword: "",
+            errors: "",
           });
         })
         .catch(() => {
